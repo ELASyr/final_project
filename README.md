@@ -34,10 +34,15 @@ Tilbil is a full-stack web application that guides learners from complete beginn
 
 ## Live Demo
 
->**Classmate feedback**
-[![Watch feedback](https://img.youtube.com/vi/mr2FmbqG6wk/maxresdefault.jpg)](https://youtu.be/mr2FmbqG6wk)
----
+**Demo video**
 
+[![Watch demo](https://img.youtube.com/vi/pXy3c28AnzE/hqdefault.jpg)](https://youtu.be/pXy3c28AnzE)
+
+**Classmate feedback**
+
+[![Watch feedback](https://img.youtube.com/vi/mr2FmbqG6wk/hqdefault.jpg)](https://youtu.be/mr2FmbqG6wk)
+
+---
 
 ## Architecture
 
