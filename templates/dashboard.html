@@ -1,0 +1,764 @@
+﻿{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+.db { max-width: 960px; font-family: 'Inter', sans-serif; }
+
+/* ── HERO ─────────────────────────────────────── */
+.hero {
+    border-radius: 14px; overflow: hidden;
+    min-height: 380px; display: flex; align-items: flex-end;
+    margin-bottom: 2rem; position: relative;
+    background:
+        linear-gradient(to right, rgba(4,8,18,.86) 0%, rgba(4,8,18,.5) 55%, rgba(4,8,18,.06) 100%),
+        url('https://cdn.pixabay.com/photo/2014/11/24/15/11/kyrgyzstan-544089_1280.jpg') center/cover no-repeat;
+}
+.hero-body { padding: 2.5rem 2.75rem; max-width: 520px; position: relative; z-index: 1; }
+.hero-label {
+    font-size: .68rem; font-weight: 600; letter-spacing: .14em;
+    text-transform: uppercase; color: rgba(255,255,255,.42); margin-bottom: .55rem;
+}
+.hero-body h1 {
+    font-size: 2.1rem; font-weight: 700; color: white;
+    line-height: 1.22; letter-spacing: -.5px; margin-bottom: .75rem;
+}
+.hero-body p {
+    font-size: .88rem; color: rgba(255,255,255,.55);
+    line-height: 1.7; margin-bottom: 1.4rem; max-width: 400px;
+}
+.hero-actions { display: flex; gap: .55rem; }
+.h-btn-p {
+    background: white; color: #0F0F0F; border: none;
+    font-family: 'Inter', sans-serif; font-size: .82rem; font-weight: 600;
+    padding: 9px 18px; border-radius: 7px; cursor: pointer; transition: opacity .15s;
+}
+.h-btn-p:hover { opacity: .85; }
+.h-btn-s {
+    background: rgba(255,255,255,.1); color: rgba(255,255,255,.75);
+    font-family: 'Inter', sans-serif; font-size: .82rem; font-weight: 600;
+    padding: 9px 18px; border-radius: 7px;
+    border: 1px solid rgba(255,255,255,.2);
+    text-decoration: none; display: inline-flex; align-items: center;
+    transition: all .15s;
+}
+.h-btn-s:hover { background: rgba(255,255,255,.18); color: white; }
+.hero-stats {
+    position: absolute; top: 1.5rem; right: 1.75rem; z-index: 2;
+    display: flex; flex-direction: column; gap: .4rem;
+}
+.h-pill {
+    background: rgba(255,255,255,.09); backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,.13); border-radius: 99px;
+    padding: .35rem .85rem; font-size: .74rem; color: rgba(255,255,255,.6);
+    font-weight: 500; display: flex; align-items: center; gap: .45rem;
+}
+.h-pill b { color: white; font-weight: 700; }
+
+/* ── SECTION LABEL ─────────────────────────────── */
+.slabel {
+    font-size: .66rem; font-weight: 600; letter-spacing: .12em;
+    text-transform: uppercase; color: #A0A8B8; margin: 0 0 .7rem;
+}
+
+/* ── PLAN SETUP CARD (inline progress, shown before plan is set) ── */
+.setup-card {
+    background: white; border-radius: 14px; border: 1px solid #EAECF0;
+    padding: 1.75rem; margin-bottom: 2rem;
+}
+.setup-header {
+    display: flex; align-items: flex-start;
+    justify-content: space-between; margin-bottom: 1.25rem;
+}
+.setup-title { font-size: 1.05rem; font-weight: 700; color: #111827; letter-spacing: -.1px; }
+.setup-sub { font-size: .78rem; color: #9CA3AF; margin-top: 3px; }
+.setup-step-label {
+    font-size: .72rem; font-weight: 600; color: #4F46E5;
+    background: #EEF2FF; padding: 3px 10px; border-radius: 99px;
+}
+.setup-progress { margin-bottom: 1.25rem; }
+.sp-bar { height: 4px; background: #F3F4F6; border-radius: 99px; overflow: hidden; }
+.sp-fill { height: 100%; background: #4F46E5; border-radius: 99px; transition: width .3s ease; }
+.sp-meta {
+    display: flex; justify-content: space-between;
+    font-size: .68rem; color: #C4C9D4; font-weight: 600; margin-top: 5px;
+}
+.sp-meta span:last-child { color: #4F46E5; }
+
+/* Inline question area */
+.setup-question { }
+.sq-text { font-size: .95rem; font-weight: 700; color: #111827; margin-bottom: .25rem; letter-spacing: -.1px; }
+.sq-hint { font-size: .75rem; color: #9CA3AF; margin-bottom: 1rem; }
+.sq-opts { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; }
+.sqopt {
+    border: 1px solid #E5E7EB; background: white; border-radius: 9px;
+    padding: .7rem .9rem; text-align: left; cursor: pointer;
+    font-family: 'Inter', sans-serif; transition: all .13s;
+}
+.sqopt:hover, .sqopt.sel { border-color: #4F46E5; background: #F5F4FF; }
+.sqopt-t { font-size: .8rem; font-weight: 700; color: #111827; display: block; margin-bottom: 2px; }
+.sqopt-d { font-size: .68rem; color: #9CA3AF; line-height: 1.35; }
+.sq-input {
+    width: 100%; border: 1px solid #E5E7EB; border-radius: 9px;
+    padding: .8rem .95rem; font-size: .88rem; font-family: 'Inter', sans-serif;
+    outline: none; color: #111827; transition: border .15s;
+}
+.sq-input:focus { border-color: #4F46E5; box-shadow: 0 0 0 3px rgba(79,70,229,.07); }
+.setup-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem; }
+.sn-back {
+    background: none; border: 1px solid #E5E7EB; color: #6B7280;
+    font-family: 'Inter', sans-serif; font-size: .8rem; font-weight: 600;
+    padding: 7px 14px; border-radius: 7px; cursor: pointer;
+}
+.sn-back:hover { background: #F9FAFB; }
+.sn-next {
+    background: #111827; color: white; border: none;
+    font-family: 'Inter', sans-serif; font-size: .8rem; font-weight: 600;
+    padding: 7px 16px; border-radius: 7px; cursor: pointer; transition: opacity .15s;
+}
+.sn-next:hover { opacity: .8; }
+
+/* ── TODAY'S PLAN (shown after plan set) ─────── */
+.today-section { margin-bottom: 2rem; display: none; }
+.today-section.show { display: block; }
+.today-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .75rem; }
+.today-task {
+    background: white; border-radius: 12px; border: 1px solid #EAECF0;
+    padding: 1.1rem 1.2rem; display: flex; align-items: center; gap: .85rem;
+    cursor: pointer; text-decoration: none; transition: all .15s;
+}
+.today-task:hover { border-color: #C7D2FE; transform: translateY(-1px); }
+.today-task.done { opacity: .55; }
+.tt-check {
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 2px solid #E5E7EB; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .65rem; color: transparent; transition: all .15s;
+}
+.today-task.done .tt-check { background: #22C55E; border-color: #22C55E; color: white; }
+.tt-body {}
+.tt-name { font-size: .85rem; font-weight: 700; color: #111827; }
+.tt-meta { font-size: .7rem; color: #9CA3AF; margin-top: 2px; }
+.today-streak {
+    background: #0D1424; border-radius: 12px; padding: 1.1rem 1.4rem;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: .75rem;
+}
+.ts-left { display: flex; align-items: center; gap: .75rem; }
+.ts-icon { font-size: 1.4rem; line-height: 1; }
+.ts-label { font-size: .78rem; font-weight: 600; color: rgba(255,255,255,.5); }
+.ts-val { font-size: 1.05rem; font-weight: 700; color: white; margin-top: 1px; }
+.ts-dots { display: flex; gap: .35rem; }
+.ts-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.12); }
+.ts-dot.done { background: #FBBF24; }
+
+/* ── CONTINUE LEARNING (big primary card) ──────── */
+.continue-card {
+    background: #0D1424; border-radius: 14px;
+    padding: 1.75rem 2rem; margin-bottom: 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    text-decoration: none; position: relative; overflow: hidden;
+    transition: opacity .15s;
+}
+.continue-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 80% 30%, rgba(79,70,229,.22), transparent 60%);
+    pointer-events: none;
+}
+.continue-card:hover { opacity: .88; }
+.cc-left { position: relative; z-index: 1; }
+.cc-tag {
+    display: inline-block; background: rgba(79,70,229,.3); color: #A5B4FC;
+    font-size: .62rem; font-weight: 600; padding: 3px 9px;
+    border-radius: 4px; letter-spacing: .05em; margin-bottom: .6rem;
+}
+.cc-title { font-size: 1.35rem; font-weight: 700; color: white; letter-spacing: -.3px; margin-bottom: .3rem; }
+.cc-sub { font-size: .8rem; color: rgba(255,255,255,.42); }
+.cc-right { position: relative; z-index: 1; display: flex; align-items: center; gap: 1.25rem; }
+.cc-progress-ring { position: relative; width: 56px; height: 56px; flex-shrink: 0; }
+.cc-progress-ring svg { transform: rotate(-90deg); }
+.cc-ring-bg { fill: none; stroke: rgba(255,255,255,.1); stroke-width: 3; }
+.cc-ring-fill { fill: none; stroke: #4F46E5; stroke-width: 3; stroke-linecap: round; transition: stroke-dashoffset .4s ease; }
+.cc-ring-pct {
+    position: absolute; inset: 0; display: flex; align-items: center;
+    justify-content: center; font-size: .7rem; font-weight: 700; color: white;
+}
+.cc-btn {
+    background: white; color: #0F0F0F; border: none;
+    font-family: 'Inter', sans-serif; font-size: .82rem; font-weight: 600;
+    padding: 10px 20px; border-radius: 8px; cursor: pointer;
+    white-space: nowrap; transition: opacity .15s;
+}
+.cc-btn:hover { opacity: .85; }
+
+/* ── QUICK ACTIONS ─────────────────────────────── */
+.quick-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .75rem; margin-bottom: 2rem; }
+.quick-card {
+    background: white; border-radius: 12px; border: 1px solid #EAECF0;
+    padding: 1.1rem 1.2rem; display: flex; align-items: center; gap: .75rem;
+    text-decoration: none; transition: all .15s;
+}
+.quick-card:hover { border-color: #C7D2FE; transform: translateY(-1px); }
+.q-icon { font-size: 1.3rem; flex-shrink: 0; line-height: 1; }
+.q-name { font-size: .85rem; font-weight: 700; color: #111827; }
+.q-desc { font-size: .7rem; color: #9CA3AF; margin-top: 2px; }
+.q-arr { margin-left: auto; color: #D1D5DB; font-size: .82rem; }
+
+/* ── STATS ─────────────────────────────────────── */
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: .75rem; }
+.stat-card {
+    background: white; border-radius: 11px; border: 1px solid #EAECF0;
+    padding: 1rem 1.1rem; transition: border-color .15s;
+}
+.stat-card:hover { border-color: #C7D2FE; }
+.s-num { font-size: 1.7rem; font-weight: 700; color: #4F46E5; letter-spacing: -.5px; line-height: 1; }
+.s-lbl { font-size: .66rem; font-weight: 600; color: #9CA3AF; margin-top: 5px; text-transform: uppercase; letter-spacing: .07em; }
+
+/* ── PLAN CARDS (after setup complete) ─────────── */
+.plans-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .75rem; margin-bottom: 2rem; display: none; }
+.plans-grid.show { display: grid; }
+.plan-card {
+    background: white; border: 1.5px solid #EAECF0; border-radius: 12px;
+    padding: 1.25rem 1.3rem; cursor: pointer; transition: all .15s; position: relative;
+}
+.plan-card:hover { border-color: #C7D2FE; transform: translateY(-1px); }
+.plan-card.recommended { border-color: #4F46E5; background: #FAFAFE; }
+.plan-card.selected { border-color: #4F46E5; background: #F5F4FF; }
+.rec-badge {
+    display: inline-block; background: #4F46E5; color: white;
+    font-size: .58rem; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; padding: 3px 8px; border-radius: 4px; margin-bottom: .65rem;
+}
+.plan-name { font-size: 1rem; font-weight: 700; color: #111827; letter-spacing: -.1px; margin-bottom: .3rem; }
+.plan-mins { font-size: .72rem; color: #6B7280; font-weight: 500; margin-bottom: .75rem; }
+.plan-perks { display: flex; flex-direction: column; gap: .3rem; }
+.perk { display: flex; align-items: flex-start; gap: .45rem; font-size: .74rem; color: #374151; }
+.perk::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: #22C55E; flex-shrink: 0; margin-top: 5px; }
+.plan-cta {
+    margin-top: 1rem; width: 100%; background: #111827; color: white; border: none;
+    font-family: 'Inter', sans-serif; font-size: .78rem; font-weight: 600;
+    padding: 8px 0; border-radius: 7px; cursor: pointer; transition: opacity .15s;
+}
+.plan-cta:hover { opacity: .8; }
+
+/* ── OVERLAY (full-screen modal, optional) ─────── */
+.overlay {
+    display: none; position: fixed; inset: 0; z-index: 600;
+    background: rgba(0,0,0,.4); backdrop-filter: blur(6px);
+    align-items: center; justify-content: center; padding: 1.5rem;
+}
+.overlay.open { display: flex; }
+
+@media(max-width: 768px) {
+    .sq-opts { grid-template-columns: 1fr 1fr; }
+    .today-grid, .quick-grid { grid-template-columns: 1fr; }
+    .stats-grid, .plans-grid { grid-template-columns: 1fr 1fr; }
+    .continue-card { flex-direction: column; align-items: flex-start; gap: 1.25rem; }
+    .cc-right { width: 100%; justify-content: space-between; }
+    .hero-body { padding: 1.5rem 1.75rem; }
+    .hero-body h1 { font-size: 1.75rem; }
+    .hero-stats { display: none; }
+    .setup-header { flex-direction: column; gap: .5rem; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-container db">
+
+    <!-- ① HERO -->
+    <section class="hero">
+        <div class="hero-body">
+            <div class="hero-label">Kyrgyz learning path</div>
+            <h1>Build your Kyrgyz around real life, stories & practice.</h1>
+            <p>Set a goal, pick a rhythm, and Tilbil guides you toward the right starting point.</p>
+            <div class="hero-actions">
+                <button class="h-btn-p" id="heroBtn" onclick="openSetup()">Create my plan</button>
+                <a href="{{ url_for('practice') }}" class="h-btn-s">Start practice</a>
+            </div>
+        </div>
+        <div class="hero-stats">
+            <div class="h-pill">🔥 <b>{{ stats.day_streak if stats else 0 }}</b> day streak</div>
+            <div class="h-pill">📖 <b>{{ stats.words_learned if stats else 0 }}</b> words learned</div>
+        </div>
+    </section>
+
+
+    <!-- ② PLAN SETUP (inline card, shown until plan is complete) -->
+    <div id="setupSection">
+        <div class="slabel">Personal plan setup</div>
+        <div class="setup-card">
+            <div class="setup-header">
+                <div>
+                    <div class="setup-title">Shape your learning path</div>
+                    <div class="setup-sub">7 questions · one clear recommendation</div>
+                </div>
+                <div class="setup-step-label" id="setupStepLabel">Step 1 of 7</div>
+            </div>
+            <div class="setup-progress">
+                <div class="sp-bar"><div class="sp-fill" id="spFill" style="width:14%"></div></div>
+                <div class="sp-meta"><span id="spQname">Focus area</span><span id="spPct">14%</span></div>
+            </div>
+            <div class="setup-question" id="setupQuestion"></div>
+            <div class="setup-nav">
+                <button class="sn-back" id="snBack" onclick="sqPrev()">← Back</button>
+                <button class="sn-next" id="snNext" onclick="sqNext()">Next →</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ② ALT: TODAY'S PLAN (shown once plan is chosen) -->
+    <div class="today-section" id="todaySection">
+        <div class="slabel">Today's plan</div>
+        <div class="today-grid" id="todayGrid"></div>
+        <div class="today-streak">
+            <div class="ts-left">
+                <div class="ts-icon">🔥</div>
+                <div>
+                    <div class="ts-label">Current streak</div>
+                    <div class="ts-val">{{ stats.day_streak if stats else 0 }} days</div>
+                </div>
+            </div>
+            <div class="ts-dots" id="streakDots"></div>
+        </div>
+    </div>
+
+
+    <!-- ③ PLAN SELECTION (shown right after quiz finishes) -->
+    <div id="plansSection">
+        <div class="slabel" id="plansLabel" style="display:none">Your recommended plans</div>
+        <div class="plans-grid" id="plansGrid"></div>
+    </div>
+
+
+    <!-- ④ CONTINUE LEARNING -->
+    <div id="continueSection" style="display:none">
+        <div class="slabel">Continue learning</div>
+        <a href="{{ url_for('practice') }}" class="continue-card">
+            <div class="cc-left">
+                <div class="cc-tag" id="ccTag">Intermediate · 40 min</div>
+                <div class="cc-title" id="ccTitle">Epic of Manas</div>
+                <div class="cc-sub" id="ccSub">Pick up where you left off</div>
+            </div>
+            <div class="cc-right">
+                <div class="cc-progress-ring">
+                    <svg width="56" height="56" viewBox="0 0 56 56">
+                        <circle class="cc-ring-bg" cx="28" cy="28" r="23"/>
+                        <circle class="cc-ring-fill" id="ccRing" cx="28" cy="28" r="23"
+                            stroke-dasharray="144.5"
+                            stroke-dashoffset="144.5"/>
+                    </svg>
+                    <div class="cc-ring-pct" id="ccPct">0%</div>
+                </div>
+                <button class="cc-btn">Resume →</button>
+            </div>
+        </a>
+    </div>
+
+
+    <!-- ⑤ QUICK ACTIONS -->
+    <div id="quickSection" style="display:none">
+        <div class="slabel">Jump in</div>
+        <div class="quick-grid">
+            <a href="{{ url_for('practice') }}" class="quick-card">
+                <div class="q-icon">🗺️</div>
+                <div><div class="q-name">Learning path</div><div class="q-desc">Continue your lessons</div></div>
+                <span class="q-arr">→</span>
+            </a>
+            <a href="{{ url_for('games') }}" class="quick-card">
+                <div class="q-icon">🎮</div>
+                <div><div class="q-name">Games</div><div class="q-desc">Vocab race, picture match</div></div>
+                <span class="q-arr">→</span>
+            </a>
+            <a href="{{ url_for('literature') }}" class="quick-card">
+                <div class="q-icon">📖</div>
+                <div><div class="q-name">Literature</div><div class="q-desc">Aitmatov, Manas & more</div></div>
+                <span class="q-arr">→</span>
+            </a>
+        </div>
+    </div>
+
+
+    <!-- ⑥ STATS -->
+    <div id="statsSection" style="display:none">
+        <div class="slabel">Your progress</div>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="s-num">{{ stats.words_learned if stats else 0 }}</div>
+                <div class="s-lbl">Words</div>
+            </div>
+            <div class="stat-card">
+                <div class="s-num">{{ stats.day_streak if stats else 0 }}</div>
+                <div class="s-lbl">Day streak</div>
+            </div>
+            <div class="stat-card">
+                <div class="s-num">{{ stats.lessons_done if stats else 0 }}</div>
+                <div class="s-lbl">Lessons done</div>
+            </div>
+            <div class="stat-card">
+                <div class="s-num">{{ ((stats.study_time_minutes if stats else 0)/60)|round(1) }}h</div>
+                <div class="s-lbl">Study time</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script>
+/* ────────────────────────────────────────────────
+   QUIZ DATA
+──────────────────────────────────────────────── */
+const QUESTIONS = [
+    {
+        key: 'reason', label: 'Focus area',
+        text: 'What kind of Kyrgyz do you want first?',
+        hint: 'This shapes the vocabulary Tilbil shows you.',
+        type: 'opts',
+        opts: [
+            {v:'daily',    t:'Daily conversation', d:'Greetings, family, travel, food.'},
+            {v:'business', t:'Business & university', d:'Professional phrases and meetings.'},
+            {v:'slang',    t:'Slang & casual chat', d:'Friendly messages and social phrases.'},
+            {v:'literature',t:'Culture & literature', d:'Manas, Aitmatov, written Kyrgyz.'},
+            {v:'travel',   t:'Travel in Kyrgyzstan', d:'Transport, cafes, directions.'},
+            {v:'family',   t:'Family & heritage', d:'Relatives, home, celebrations.'},
+        ]
+    },
+    {
+        key: 'minutes', label: 'Daily time',
+        text: 'How much time per day?',
+        hint: 'Small daily sessions beat occasional long ones.',
+        type: 'opts',
+        opts: [
+            {v:'5',  t:'5 minutes',  d:'Micro practice for busy days.'},
+            {v:'10', t:'10 minutes', d:'One lesson and five words.'},
+            {v:'20', t:'20 minutes', d:'Lesson, pronunciation, short quiz.'},
+            {v:'35', t:'35 minutes', d:'Learn, repeat, write, play.'},
+            {v:'45', t:'45 minutes', d:'Full lesson plus speaking review.'},
+            {v:'60', t:'1 hour',     d:'Deep session with reading.'},
+        ]
+    },
+    {
+        key: 'level', label: 'Starting level',
+        text: 'Where are you starting from?',
+        hint: 'Helps Tilbil set the right difficulty.',
+        type: 'opts',
+        opts: [
+            {v:'beginner',  t:'Complete beginner', d:'Basics from zero.'},
+            {v:'basic',     t:'I know some words', d:'Greetings and common nouns.'},
+            {v:'speaking',  t:'I can speak a little', d:'Want more fluency.'},
+            {v:'reading',   t:'Reading practice', d:'Understand stories and texts.'},
+            {v:'listening', t:'I understand a little', d:'Listening easier than answering.'},
+            {v:'restart',   t:'I learned before', d:'Clean restart and confidence.'},
+        ]
+    },
+    {
+        key: 'alphabet', label: 'Cyrillic comfort',
+        text: 'How comfortable are you with Cyrillic?',
+        hint: 'Kyrgyz spelling and pronunciation depend on it.',
+        type: 'opts',
+        opts: [
+            {v:'new',        t:'New to Cyrillic',   d:'Slow intro with support.'},
+            {v:'some',       t:'Somewhat familiar', d:'Review only when it matters.'},
+            {v:'comfortable',t:'Comfortable',       d:'Move straight into words.'},
+            {v:'native',     t:'I read it well',    d:'Focus on Kyrgyz-specific letters.'},
+            {v:'latin',      t:'Prefer Latin hints',d:'Transliteration while I adjust.'},
+            {v:'sounds',     t:'Sound help needed', d:'Focus on tricky pronunciations.'},
+        ]
+    },
+    {
+        key: 'style', label: 'Practice style',
+        text: 'Which practice style fits you?',
+        hint: 'Tilbil adapts to how you like to learn.',
+        type: 'opts',
+        opts: [
+            {v:'games',      t:'Games & points',     d:'Quizzes and leaderboard energy.'},
+            {v:'stories',    t:'Stories & culture',  d:'Manas, Aitmatov, and context.'},
+            {v:'speaking',   t:'Speaking drills',    d:'Practical repeatable phrases.'},
+            {v:'structured', t:'Structured lessons', d:'Clear modules and checkpoints.'},
+            {v:'audio',      t:'Audio first',        d:'Hear phrases, then read.'},
+            {v:'writing',    t:'Writing practice',   d:'Type short answers and sentences.'},
+        ]
+    },
+    {
+        key: 'goal', label: 'Your goal',
+        text: 'Your main goal in one sentence.',
+        hint: 'e.g. speak with relatives, travel in Kyrgyzstan, read Aitmatov.',
+        type: 'text',
+        placeholder: 'My goal is to…'
+    },
+    {
+        key: 'deadline', label: 'Timeline',
+        text: 'When do you want to feel progress?',
+        hint: 'Sets pace without making the plan stressful.',
+        type: 'opts',
+        opts: [
+            {v:'week',     t:'This week',    d:'Quick wins and survival phrases.'},
+            {v:'month',    t:'This month',   d:'Steady vocab and conversations.'},
+            {v:'semester', t:'This semester',d:'Lessons, games, and reading.'},
+            {v:'long',     t:'Long term',    d:'Deep fluency and confident reading.'},
+        ]
+    }
+];
+
+/* ────────────────────────────────────────────────
+   STATE
+──────────────────────────────────────────────── */
+const PLAN_KEY = 'tilbil_plan_{{ session.user_id }}';
+const ans = {};
+let qi = 0;
+
+/* ────────────────────────────────────────────────
+   RENDER QUESTION
+──────────────────────────────────────────────── */
+function renderQ() {
+    const q = QUESTIONS[qi];
+    const pct = Math.round(((qi + 1) / QUESTIONS.length) * 100);
+
+    document.getElementById('spFill').style.width = pct + '%';
+    document.getElementById('spPct').textContent = pct + '%';
+    document.getElementById('spQname').textContent = q.label;
+    document.getElementById('setupStepLabel').textContent = 'Step ' + (qi + 1) + ' of ' + QUESTIONS.length;
+    document.getElementById('snBack').style.visibility = qi === 0 ? 'hidden' : 'visible';
+    document.getElementById('snNext').textContent = qi === QUESTIONS.length - 1 ? 'Create plan ✦' : 'Next →';
+
+    const area = document.getElementById('setupQuestion');
+    if (q.type === 'text') {
+        area.innerHTML =
+            '<div class="sq-text">' + q.text + '</div>' +
+            '<div class="sq-hint">' + q.hint + '</div>' +
+            '<input class="sq-input" id="sqTextIn" type="text" placeholder="' + q.placeholder + '" value="' + (ans[q.key] || '') + '">';
+    } else {
+        const saved = ans[q.key] || null;
+        area.innerHTML =
+            '<div class="sq-text">' + q.text + '</div>' +
+            '<div class="sq-hint">' + q.hint + '</div>' +
+            '<div class="sq-opts">' +
+            q.opts.map(o =>
+                '<button class="sqopt' + (saved === o.v ? ' sel' : '') + '" data-v="' + o.v + '">' +
+                '<span class="sqopt-t">' + o.t + '</span>' +
+                '<span class="sqopt-d">' + o.d + '</span>' +
+                '</button>'
+            ).join('') +
+            '</div>';
+        area.querySelectorAll('.sqopt').forEach(b => b.addEventListener('click', function () {
+            area.querySelectorAll('.sqopt').forEach(x => x.classList.remove('sel'));
+            this.classList.add('sel');
+            ans[q.key] = this.dataset.v;
+        }));
+    }
+}
+
+function sqCanAdvance() {
+    const q = QUESTIONS[qi];
+    if (q.type === 'text') {
+        ans[q.key] = (document.getElementById('sqTextIn')?.value || '').trim();
+        return ans[q.key].length > 1;
+    }
+    return !!ans[q.key];
+}
+
+function sqNext() {
+    if (!sqCanAdvance()) {
+        document.getElementById('setupQuestion').animate(
+            [{transform:'translateX(0)'},{transform:'translateX(-5px)'},{transform:'translateX(5px)'},{transform:'translateX(0)'}],
+            {duration: 180}
+        );
+        return;
+    }
+    if (qi < QUESTIONS.length - 1) { qi++; renderQ(); return; }
+    finishSetup();
+}
+
+function sqPrev() { if (qi > 0) { qi--; renderQ(); } }
+
+/* ────────────────────────────────────────────────
+   FINISH → build plan cards
+──────────────────────────────────────────────── */
+function finishSetup() {
+    const {minutes = '20', level = 'beginner', reason = 'daily', style = 'structured', alphabet = 'some'} = ans;
+    const mins = parseInt(minutes);
+    const isBeginnerLevel = level === 'beginner' || level === 'basic';
+    const focusLabel = {
+        daily:'Daily conversation', business:'Business Kyrgyz', slang:'Casual chat',
+        literature:'Literary Kyrgyz', travel:'Travel Kyrgyz', family:'Family & heritage'
+    }[reason] || 'Daily conversation';
+
+    const plans = [
+        {
+            id: 'light', name: 'Light track',
+            minsLabel: Math.max(5, Math.min(mins, 10)) + ' min / day',
+            rec: mins <= 10,
+            perks: [
+                'Core greetings & survival words',
+                isBeginnerLevel ? 'Cyrillic intro included' : 'Audio-first listening',
+                'Daily word card',
+                'Flexible, no-pressure pace'
+            ]
+        },
+        {
+            id: 'standard', name: 'Standard track',
+            minsLabel: Math.max(15, Math.min(mins, 25)) + ' min / day',
+            rec: mins > 10 && mins <= 35,
+            perks: [
+                focusLabel + ' vocabulary',
+                isBeginnerLevel ? 'Lesson + mini quiz' : 'Speaking drills & review',
+                style === 'games' ? 'Vocab race games included' : 'Structured lesson modules',
+                'Weekly progress check-in'
+            ]
+        },
+        {
+            id: 'deep', name: 'Deep track',
+            minsLabel: Math.max(35, Math.min(mins, 60)) + ' min / day',
+            rec: mins > 35,
+            perks: [
+                focusLabel + ' + grammar foundations',
+                style === 'stories' || reason === 'literature' ? 'Manas & Aitmatov readings' : 'Writing & sentence practice',
+                'Speaking drills + audio review',
+                'Full lesson + games + reading'
+            ]
+        }
+    ];
+
+    if (!plans.some(p => p.rec)) plans[1].rec = true;
+
+    /* hide setup, show plan grid */
+    document.getElementById('setupSection').style.display = 'none';
+    document.getElementById('plansLabel').style.display = '';
+    const grid = document.getElementById('plansGrid');
+    grid.innerHTML = '';
+    plans.forEach(plan => {
+        const card = document.createElement('div');
+        card.className = 'plan-card' + (plan.rec ? ' recommended' : '');
+        card.innerHTML =
+            (plan.rec ? '<div class="rec-badge">Recommended for you</div>' : '') +
+            '<div class="plan-name">' + plan.name + '</div>' +
+            '<div class="plan-mins">' + plan.minsLabel + '</div>' +
+            '<div class="plan-perks">' + plan.perks.map(p => '<div class="perk">' + p + '</div>').join('') + '</div>' +
+            '<button class="plan-cta">Start this plan →</button>';
+        card.querySelector('.plan-cta').addEventListener('click', e => {
+            e.stopPropagation();
+            choosePlan(plan, card);
+        });
+        if (!plan.rec) card.addEventListener('click', () => choosePlan(plan, card));
+        grid.appendChild(card);
+    });
+    grid.classList.add('show');
+}
+
+/* ────────────────────────────────────────────────
+   CHOOSE PLAN → reveal rest of dashboard
+──────────────────────────────────────────────── */
+function choosePlan(plan, card) {
+    document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected', 'recommended'));
+    card.classList.add('selected');
+
+    localStorage.setItem(PLAN_KEY, JSON.stringify({plan: plan.id, ans}));
+
+    /* hide plan grid, show today + dashboard */
+    setTimeout(() => {
+        document.getElementById('plansGrid').classList.remove('show');
+        document.getElementById('plansLabel').style.display = 'none';
+        buildTodayPlan(plan);
+        buildContinueCard(plan);
+        document.getElementById('todaySection').classList.add('show');
+        document.getElementById('continueSection').style.display = '';
+        document.getElementById('quickSection').style.display = '';
+        document.getElementById('statsSection').style.display = '';
+        document.getElementById('heroBtn').textContent = 'Edit plan';
+    }, 320);
+}
+
+/* ────────────────────────────────────────────────
+   TODAY'S TASKS
+──────────────────────────────────────────────── */
+function buildTodayPlan(plan) {
+    const tasks = {
+        light: [
+            {icon:'📖', name:'5 new words', meta:'Flashcard review · 3 min', url: "{{ url_for('practice') }}"},
+            {icon:'🔊', name:'Listen & repeat', meta:'3 phrases · 2 min', url: "{{ url_for('practice') }}"},
+            {icon:'✅', name:'Daily check-in', meta:'Mark your streak', url: '#'},
+        ],
+        standard: [
+            {icon:'📖', name:'Vocabulary lesson', meta:'10 words · 8 min', url: "{{ url_for('practice') }}"},
+            {icon:'🎮', name:'Vocab race', meta:'Quick game · 5 min', url: "{{ url_for('games') }}"},
+            {icon:'🔊', name:'Pronunciation drill', meta:'5 phrases · 7 min', url: "{{ url_for('practice') }}"},
+        ],
+        deep: [
+            {icon:'📖', name:'Full lesson', meta:'Grammar + vocab · 15 min', url: "{{ url_for('practice') }}"},
+            {icon:'📜', name:'Read a passage', meta:'Manas excerpt · 10 min', url: "{{ url_for('literature') }}"},
+            {icon:'✍️', name:'Writing drill', meta:'3 sentences · 10 min', url: "{{ url_for('practice') }}"},
+        ]
+    }[plan.id] || [];
+
+    const grid = document.getElementById('todayGrid');
+    grid.innerHTML = '';
+    tasks.forEach(t => {
+        const a = document.createElement('a');
+        a.className = 'today-task';
+        a.href = t.url;
+        a.innerHTML =
+            '<div class="tt-check">✓</div>' +
+            '<div class="tt-body"><div class="tt-name">' + t.icon + '  ' + t.name + '</div><div class="tt-meta">' + t.meta + '</div></div>';
+        grid.appendChild(a);
+    });
+
+    /* streak dots — last 7 days */
+    const dots = document.getElementById('streakDots');
+    const streak = {{ stats.day_streak if stats else 0 }};
+    dots.innerHTML = '';
+    for (let i = 0; i < 7; i++) {
+        const d = document.createElement('div');
+        d.className = 'ts-dot' + (i < Math.min(streak, 7) ? ' done' : '');
+        dots.appendChild(d);
+    }
+}
+
+/* ────────────────────────────────────────────────
+   CONTINUE LEARNING CARD
+──────────────────────────────────────────────── */
+function buildContinueCard(plan) {
+    const pct = {{ stats.progress_percent if stats else 0 }};
+    const circumference = 2 * Math.PI * 23; // r=23
+    const offset = circumference * (1 - pct / 100);
+
+    document.getElementById('ccTag').textContent =
+        plan.id === 'deep' ? 'Intermediate · 40 min' :
+        plan.id === 'standard' ? 'Beginner · 20 min' : 'Beginner · 10 min';
+    document.getElementById('ccTitle').textContent =
+        plan.id === 'deep' ? 'Epic of Manas' :
+        plan.id === 'standard' ? 'Unit 2 — Daily Life' : 'Unit 1 — Greetings';
+    document.getElementById('ccSub').textContent = 'Pick up where you left off';
+    document.getElementById('ccPct').textContent = pct + '%';
+    document.getElementById('ccRing').style.strokeDasharray = circumference;
+    document.getElementById('ccRing').style.strokeDashoffset = offset;
+}
+
+/* ────────────────────────────────────────────────
+   INIT
+──────────────────────────────────────────────── */
+function openSetup() { qi = 0; renderQ(); }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const saved = localStorage.getItem(PLAN_KEY);
+    if (saved) {
+        try {
+            const data = JSON.parse(saved);
+            Object.assign(ans, data.ans || {});
+            const fakePlan = {id: data.plan};
+            document.getElementById('setupSection').style.display = 'none';
+            buildTodayPlan(fakePlan);
+            buildContinueCard(fakePlan);
+            document.getElementById('todaySection').classList.add('show');
+            document.getElementById('continueSection').style.display = '';
+            document.getElementById('quickSection').style.display = '';
+            document.getElementById('statsSection').style.display = '';
+            document.getElementById('heroBtn').textContent = 'Edit plan';
+        } catch(e) { renderQ(); }
+    } else {
+        renderQ();
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,641 @@
+{% extends "base.html" %}
+{% block title %}Games{% endblock %}
+
+{% block extra_css %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; }
+.gp { max-width: 960px; font-family: 'Inter', sans-serif; }
+
+/* ── HERO CARD ─────────────────────────────────── */
+.g-hero {
+    border-radius: 16px; overflow: hidden;
+    min-height: 300px; display: flex; align-items: flex-end;
+    margin-bottom: 2rem; position: relative;
+    background:
+        linear-gradient(to right, rgba(4,8,18,.88) 0%, rgba(4,8,18,.55) 55%, rgba(4,8,18,.1) 100%),
+        url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1400&q=85') center 40%/cover no-repeat;
+}
+.g-hero-body {
+    padding: 2.2rem 2.5rem; max-width: 520px;
+    position: relative; z-index: 1;
+}
+.g-hero-tag {
+    display: inline-flex; align-items: center; gap: .4rem;
+    font-size: .63rem; font-weight: 700; letter-spacing: .12em;
+    text-transform: uppercase; color: rgba(255,255,255,.5);
+    margin-bottom: .55rem;
+}
+.g-hero-tag-dot { width: 5px; height: 5px; border-radius: 50%; background: #4ADE80; flex-shrink: 0; }
+.g-hero-body h1 {
+    font-size: 2rem; font-weight: 700; color: white;
+    line-height: 1.2; letter-spacing: -.4px; margin-bottom: .6rem;
+}
+.g-hero-body p {
+    font-size: .88rem; color: rgba(255,255,255,.52);
+    line-height: 1.7; margin-bottom: 1.3rem; max-width: 380px;
+}
+.g-hero-foot { display: flex; align-items: center; gap: .65rem; }
+.g-hero-btn {
+    background: white; color: #0F0F0F; border: none;
+    font-family: 'Inter', sans-serif; font-size: .82rem; font-weight: 600;
+    padding: 9px 20px; border-radius: 8px; cursor: pointer; transition: opacity .15s;
+}
+.g-hero-btn:hover { opacity: .85; }
+.xp-pill {
+    display: flex; align-items: center; gap: .45rem;
+    background: rgba(255,255,255,.1); backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,.15); border-radius: 99px;
+    padding: .38rem .85rem; font-size: .76rem; font-weight: 600; color: white;
+}
+.xp-pip { width: 7px; height: 7px; border-radius: 50%; background: #F59E0B; flex-shrink: 0; }
+
+/* ── SECTION LABEL ─────────────────────────────── */
+.sec-label {
+    font-size: .64rem; font-weight: 700; letter-spacing: .13em;
+    text-transform: uppercase; color: #94A3B8; margin: 0 0 .85rem;
+}
+
+/* ── GAME GRID ─────────────────────────────────── */
+.games-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: .85rem; margin-bottom: 2.25rem; }
+.game-card {
+    background: white; border-radius: 13px; border: 1px solid #EAECF2;
+    padding: 1.3rem 1.4rem; cursor: pointer;
+    transition: all .2s ease; position: relative; overflow: hidden;
+}
+.game-card::after {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    opacity: 0; transition: opacity .2s;
+}
+.game-card:hover:not(.gc-disabled) { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(99,102,241,.09); }
+.game-card:hover:not(.gc-disabled)::after { opacity: 1; }
+.gc-indigo:hover::after { background: linear-gradient(135deg,rgba(99,102,241,.04) 0%,transparent 60%); }
+.gc-sky:hover::after   { background: linear-gradient(135deg,rgba(14,165,233,.04) 0%,transparent 60%); }
+.gc-purple:hover::after{ background: linear-gradient(135deg,rgba(139,92,246,.04) 0%,transparent 60%); }
+.gc-amber:hover::after { background: linear-gradient(135deg,rgba(245,158,11,.04) 0%,transparent 60%); }
+.gc-disabled { opacity: .52; cursor: not-allowed; }
+
+.gc-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1rem; }
+.gc-icon-box {
+    width: 42px; height: 42px; border-radius: 11px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.gc-indigo .gc-icon-box { background: #EEF2FF; }
+.gc-sky    .gc-icon-box { background: #F0F9FF; }
+.gc-purple .gc-icon-box { background: #F5F3FF; }
+.gc-amber  .gc-icon-box { background: #FFFBEB; }
+
+.gc-badge {
+    font-size: .59rem; font-weight: 700; letter-spacing: .07em;
+    text-transform: uppercase; padding: 3px 8px; border-radius: 99px;
+}
+.badge-live { background: #DCFCE7; color: #15803D; }
+.badge-beta { background: #FEF9C3; color: #A16207; }
+.badge-soon { background: #F1F5F9; color: #94A3B8; }
+
+.gc-title { font-size: .95rem; font-weight: 700; color: #0F172A; letter-spacing: -.1px; margin-bottom: .25rem; }
+.gc-desc  { font-size: .76rem; color: #94A3B8; line-height: 1.5; margin-bottom: 1.1rem; }
+.gc-foot  { display: flex; align-items: center; justify-content: space-between; }
+.gc-level { display: flex; align-items: center; gap: .4rem; font-size: .7rem; font-weight: 600; color: #94A3B8; }
+.gc-lvl-dot { width: 5px; height: 5px; border-radius: 50%; }
+.gc-indigo .gc-lvl-dot { background: #6366F1; }
+.gc-sky    .gc-lvl-dot { background: #0EA5E9; }
+.gc-purple .gc-lvl-dot { background: #8B5CF6; }
+.gc-amber  .gc-lvl-dot { background: #F59E0B; }
+.gc-play-btn {
+    font-family: 'Inter', sans-serif; font-size: .76rem; font-weight: 600;
+    padding: 6px 14px; border-radius: 7px; border: none; cursor: pointer; transition: all .15s;
+}
+.gc-indigo .gc-play-btn { background: #EEF2FF; color: #4F46E5; }
+.gc-sky    .gc-play-btn { background: #F0F9FF; color: #0284C7; }
+.gc-purple .gc-play-btn { background: #F5F3FF; color: #7C3AED; }
+.gc-amber  .gc-play-btn { background: #FFFBEB; color: #B45309; }
+.gc-indigo .gc-play-btn:hover { background: #4F46E5; color: white; }
+.gc-sky    .gc-play-btn:hover { background: #0284C7; color: white; }
+.gc-purple .gc-play-btn:hover { background: #7C3AED; color: white; }
+.gc-amber  .gc-play-btn:hover { background: #B45309; color: white; }
+.gc-disabled .gc-play-btn { background: #F1F5F9; color: #CBD5E1; cursor: not-allowed; }
+
+/* ── LEADERBOARD ───────────────────────────────── */
+.lb-card { background: white; border-radius: 14px; border: 1px solid #EAECF2; overflow: hidden; margin-bottom: 2rem; }
+.lb-header {
+    padding: 1.1rem 1.4rem; display: flex; align-items: center;
+    justify-content: space-between; border-bottom: 1px solid #F1F3F6;
+}
+.lb-header-left { display: flex; align-items: center; gap: .65rem; }
+.lb-header-icon {
+    width: 34px; height: 34px; border-radius: 9px; background: #FFFBEB;
+    display: flex; align-items: center; justify-content: center;
+}
+.lb-header-title { font-size: .9rem; font-weight: 700; color: #0F172A; }
+.lb-header-sub   { font-size: .7rem; color: #94A3B8; margin-top: 1px; }
+.lb-period { font-size: .68rem; font-weight: 600; color: #6366F1; background: #EEF2FF; padding: 3px 10px; border-radius: 99px; }
+.lb-row {
+    display: flex; align-items: center; gap: 1rem;
+    padding: .85rem 1.4rem; border-bottom: 1px solid #F8F9FB; transition: background .12s;
+}
+.lb-row:last-child { border-bottom: none; }
+.lb-row:hover { background: #FAFBFF; }
+.lb-row-you {
+    background: linear-gradient(90deg,rgba(99,102,241,.05) 0%,rgba(99,102,241,.02) 100%);
+    border-left: 3px solid #6366F1; padding-left: calc(1.4rem - 3px);
+}
+.lb-rank-box { width: 28px; text-align: center; flex-shrink: 0; }
+.lb-rank-num {
+    font-size: .75rem; font-weight: 700; color: #94A3B8;
+    width: 24px; height: 24px; border-radius: 6px;
+    display: inline-flex; align-items: center; justify-content: center;
+}
+.lr-1 { background: #FFFBEB; color: #B45309; }
+.lr-2 { background: #F8FAFC; color: #475569; }
+.lr-3 { background: #FFF7F0; color: #9A3412; }
+.lb-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: #F1F5F9; display: flex; align-items: center;
+    justify-content: center; font-size: .72rem; font-weight: 700; color: #64748B; flex-shrink: 0;
+}
+.lb-you-av { background: #EEF2FF; color: #4F46E5; }
+.lb-name { flex: 1; font-size: .84rem; font-weight: 600; color: #0F172A; }
+.lb-you-tag {
+    font-size: .6rem; font-weight: 700; color: #6366F1;
+    background: #EEF2FF; padding: 2px 7px; border-radius: 99px; margin-left: .45rem;
+}
+.lb-pts { font-size: .84rem; font-weight: 700; color: #0F172A; }
+.lb-pts-sup { font-size: .65rem; font-weight: 500; color: #94A3B8; margin-left: 2px; }
+
+/* ── MODAL ─────────────────────────────────────── */
+.modal {
+    display: none; position: fixed; inset: 0; z-index: 700;
+    background: rgba(8,8,20,.6); backdrop-filter: blur(8px);
+    align-items: center; justify-content: center; padding: 1.5rem;
+}
+.modal.active { display: flex; }
+.modal-box {
+    width: min(540px,100%); background: white; border-radius: 18px;
+    padding: 2rem; position: relative; border: 1px solid #EAECF2;
+    box-shadow: 0 24px 64px rgba(0,0,0,.1);
+}
+.modal-close {
+    position: absolute; top: 1rem; right: 1rem;
+    width: 30px; height: 30px; border-radius: 8px;
+    border: 1px solid #E5E7EB; background: white;
+    font-size: .72rem; color: #9CA3AF; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: all .15s;
+}
+.modal-close:hover { background: #F9FAFB; color: #374151; }
+.modal-eyebrow {
+    display: flex; align-items: center; gap: .5rem;
+    font-size: .64rem; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: #6366F1; margin-bottom: .55rem;
+}
+.modal-eyebrow-icon {
+    width: 22px; height: 22px; border-radius: 6px; background: #EEF2FF;
+    display: flex; align-items: center; justify-content: center;
+}
+.modal-box h2 { font-size: 1.2rem; font-weight: 700; color: #0F172A; letter-spacing: -.2px; margin-bottom: .3rem; }
+.modal-sub { font-size: .8rem; color: #94A3B8; margin-bottom: 1.4rem; line-height: 1.5; }
+.game-hud { display: flex; align-items: center; gap: .65rem; margin-bottom: 1.1rem; }
+.hud-chip {
+    display: flex; align-items: center; gap: .35rem;
+    background: #F8F9FB; border-radius: 99px; padding: .3rem .75rem;
+    font-size: .74rem; font-weight: 600; color: #374151; white-space: nowrap;
+}
+.hud-bar { flex: 1; height: 3px; background: #F1F3F6; border-radius: 99px; overflow: hidden; }
+.hud-bar-fill { height: 100%; background: #6366F1; border-radius: 99px; transition: width 1s linear; }
+.word-display {
+    background: #0F0F1A; border-radius: 12px; padding: 1.5rem;
+    text-align: center; margin-bottom: 1.1rem;
+    border: 1px solid rgba(99,102,241,.15);
+}
+.word-main { font-size: 2rem; font-weight: 700; color: white; letter-spacing: -.5px; line-height: 1; margin-bottom: .3rem; }
+.word-hint { font-size: .72rem; color: rgba(255,255,255,.28); font-weight: 500; }
+.pic-frame {
+    border-radius: 12px; overflow: hidden; margin-bottom: 1.1rem;
+    aspect-ratio: 16/7; position: relative; background: #F1F5F9;
+}
+.pic-frame img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity .3s; }
+.pic-label {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,.55) 0%, transparent 100%);
+    padding: .75rem 1rem .6rem;
+    font-size: .72rem; font-weight: 600; color: rgba(255,255,255,.55);
+    letter-spacing: .06em; text-transform: uppercase;
+}
+.game-options { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+.option-btn {
+    background: #F8F9FB; border: 1.5px solid #EAECF2; border-radius: 10px;
+    padding: .85rem 1rem; font-family: 'Inter', sans-serif;
+    font-size: .84rem; font-weight: 600; color: #374151;
+    cursor: pointer; transition: all .13s; text-align: center;
+}
+.option-btn:hover:not(.correct):not(.wrong) { border-color: #6366F1; background: #F0F0FF; color: #4F46E5; }
+.option-btn.correct { background: #DCFCE7; border-color: #22C55E; color: #15803D; }
+.option-btn.wrong   { background: #FEE2E2; border-color: #EF4444; color: #B91C1C; }
+.game-over-card { text-align: center; padding: 1.25rem 0 .25rem; }
+.go-icon { width: 56px; height: 56px; border-radius: 16px; background: #EEF2FF; display: flex; align-items: center; justify-content: center; margin: 0 auto .85rem; }
+.go-title { font-size: 1.15rem; font-weight: 700; color: #0F172A; margin-bottom: .25rem; }
+.go-score { font-size: 2.4rem; font-weight: 700; color: #6366F1; letter-spacing: -.5px; line-height: 1; margin-bottom: .25rem; }
+.go-sub { font-size: .78rem; color: #94A3B8; margin-bottom: 1.5rem; }
+.btn-replay {
+    background: #0F172A; color: white; border: none;
+    font-family: 'Inter', sans-serif; font-size: .84rem; font-weight: 600;
+    padding: 11px 0; border-radius: 9px; cursor: pointer;
+    transition: opacity .15s; width: 100%;
+}
+.btn-replay:hover { opacity: .85; }
+.hidden { display: none !important; }
+
+@media(max-width: 768px) {
+    .games-grid { grid-template-columns: 1fr; }
+    .g-hero { min-height: 240px; }
+    .g-hero-body { padding: 1.5rem 1.5rem; }
+    .g-hero-body h1 { font-size: 1.65rem; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-container gp">
+
+    <!-- HERO -->
+    <section class="g-hero">
+        <div class="g-hero-body">
+            <div class="g-hero-tag"><div class="g-hero-tag-dot"></div>Games &amp; challenges</div>
+            <h1>Play your way to fluency.</h1>
+            <p>Earn XP, climb the board, and learn Kyrgyz without even noticing.</p>
+            <div class="g-hero-foot">
+                <button class="g-hero-btn" onclick="openGame('vocab')">Play now →</button>
+                <div class="xp-pill">
+                    <div class="xp-pip"></div>
+                    {{ user_stats.game_points if user_stats else 0 }} XP total
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- GAME GRID -->
+    <div class="sec-label">All games</div>
+    <div class="games-grid">
+
+        <div class="game-card gc-sky" onclick="openGame('picture')">
+            <div class="gc-head">
+                <div class="gc-icon-box">
+                    <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                        <rect x="2" y="2" width="18" height="18" rx="3" stroke="#0284C7" stroke-width="1.6"/>
+                        <circle cx="7.5" cy="7.5" r="1.5" fill="#0284C7"/>
+                        <path d="M2 15l5-4.5 4 3.5 3-2.5 6 5.5" stroke="#0284C7" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <span class="gc-badge badge-live">Live</span>
+            </div>
+            <div class="gc-title">Picture Matching</div>
+            <div class="gc-desc">See a real photo, pick the right Kyrgyz word. Builds visual vocabulary fast and naturally.</div>
+            <div class="gc-foot">
+                <div class="gc-level"><div class="gc-lvl-dot"></div>Beginner</div>
+                <button class="gc-play-btn">Play →</button>
+            </div>
+        </div>
+
+        <div class="game-card gc-indigo" onclick="openGame('vocab')">
+            <div class="gc-head">
+                <div class="gc-icon-box">
+                    <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                        <circle cx="11" cy="11" r="8.5" stroke="#4F46E5" stroke-width="1.6"/>
+                        <path d="M11 3v2M11 17v2M3 11h2M17 11h2" stroke="#4F46E5" stroke-width="1.5" stroke-linecap="round"/>
+                        <circle cx="11" cy="11" r="2.5" fill="#4F46E5"/>
+                    </svg>
+                </div>
+                <span class="gc-badge badge-live">Live</span>
+            </div>
+            <div class="gc-title">Vocabulary Race</div>
+            <div class="gc-desc">Speed challenge — translate Kyrgyz words against the clock. Earn XP for every correct answer.</div>
+            <div class="gc-foot">
+                <div class="gc-level"><div class="gc-lvl-dot"></div>All levels</div>
+                <button class="gc-play-btn">Play →</button>
+            </div>
+        </div>
+
+        <div class="game-card gc-purple" onclick="alert('Word Builder is in beta — coming very soon!')">
+            <div class="gc-head">
+                <div class="gc-icon-box">
+                    <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                        <rect x="2" y="5" width="7" height="7" rx="2" stroke="#7C3AED" stroke-width="1.6"/>
+                        <rect x="13" y="5" width="7" height="7" rx="2" stroke="#7C3AED" stroke-width="1.6"/>
+                        <rect x="6.5" y="14" width="9" height="5" rx="2" stroke="#7C3AED" stroke-width="1.6"/>
+                        <path d="M5.5 12v2M16.5 12v2" stroke="#7C3AED" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <span class="gc-badge badge-beta">Beta</span>
+            </div>
+            <div class="gc-title">Word Builder</div>
+            <div class="gc-desc">Arrange Kyrgyz words into correct sentences. Builds grammar intuition naturally over time.</div>
+            <div class="gc-foot">
+                <div class="gc-level"><div class="gc-lvl-dot"></div>Pre-Intermediate</div>
+                <button class="gc-play-btn">Preview →</button>
+            </div>
+        </div>
+
+        <div class="game-card gc-amber gc-disabled">
+            <div class="gc-head">
+                <div class="gc-icon-box">
+                    <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                        <path d="M4 3h14v11a7 7 0 01-14 0V3z" stroke="#B45309" stroke-width="1.6" stroke-linejoin="round"/>
+                        <path d="M8 8.5h6M8 11.5h4" stroke="#B45309" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M11 18v2M8.5 20h5" stroke="#B45309" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <span class="gc-badge badge-soon">Coming soon</span>
+            </div>
+            <div class="gc-title">Great Manas Quiz</div>
+            <div class="gc-desc">Test your knowledge of Kyrgyzstan's greatest epic poem. Culture and language combined.</div>
+            <div class="gc-foot">
+                <div class="gc-level"><div class="gc-lvl-dot"></div>Intermediate</div>
+                <button class="gc-play-btn" disabled>Soon</button>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- LEADERBOARD -->
+    <div class="sec-label">Leaderboard</div>
+    <div class="lb-card">
+        <div class="lb-header">
+            <div class="lb-header-left">
+                <div class="lb-header-icon">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                        <path d="M4 3.5h10v7a5 5 0 01-10 0v-7z" stroke="#B45309" stroke-width="1.5" stroke-linejoin="round"/>
+                        <path d="M4 6.5H2a2 2 0 002 2M14 6.5h2a2 2 0 01-2 2" stroke="#B45309" stroke-width="1.4" stroke-linecap="round"/>
+                        <path d="M9 14v2.5M6.5 16.5h5" stroke="#B45309" stroke-width="1.4" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="lb-header-title">Top players this week</div>
+                    <div class="lb-header-sub">XP earned from all games</div>
+                </div>
+            </div>
+            <div class="lb-period">This week</div>
+        </div>
+
+        {% for entry in leaderboard %}
+        {% set is_you = (entry.user_id == current_user_id) %}
+        <div class="lb-row{% if is_you %} lb-row-you{% endif %}">
+            <div class="lb-rank-box">
+                <div class="lb-rank-num {% if loop.index==1 %}lr-1{% elif loop.index==2 %}lr-2{% elif loop.index==3 %}lr-3{% endif %}">
+                    {{ loop.index }}
+                </div>
+            </div>
+            <div class="lb-avatar{% if is_you %} lb-you-av{% endif %}">
+                {% if is_you %}Y{% else %}{{ entry.name[0]|upper }}{% endif %}
+            </div>
+            <div class="lb-name">
+                {% if is_you %}You{% else %}{{ entry.name }}{% endif %}
+                {% if is_you %}<span class="lb-you-tag">you</span>{% endif %}
+            </div>
+            <div class="lb-pts">{{ entry.pts }}<span class="lb-pts-sup">xp</span></div>
+        </div>
+        {% endfor %}
+
+        {% if not leaderboard %}
+        <div class="lb-row lb-row-you">
+            <div class="lb-rank-box"><div class="lb-rank-num lr-1">1</div></div>
+            <div class="lb-avatar lb-you-av">Y</div>
+            <div class="lb-name">You <span class="lb-you-tag">you</span></div>
+            <div class="lb-pts">{{ user_stats.game_points if user_stats else 0 }}<span class="lb-pts-sup">xp</span></div>
+        </div>
+        {% endif %}
+    </div>
+
+</div><!-- /gp -->
+
+
+<!-- VOCABULARY RACE MODAL -->
+<div class="modal" id="vocabModal">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeVocabGame()">✕</button>
+        <div id="gameArea">
+            <div class="modal-eyebrow">
+                <div class="modal-eyebrow-icon">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <circle cx="7" cy="7" r="5.5" stroke="#6366F1" stroke-width="1.4"/>
+                        <circle cx="7" cy="7" r="2" fill="#6366F1"/>
+                        <path d="M7 2v1.5M7 10.5V12M2 7h1.5M10.5 7H12" stroke="#6366F1" stroke-width="1.3" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                Vocabulary Race
+            </div>
+            <h2>Translate fast, earn XP.</h2>
+            <p class="modal-sub">Pick the correct English meaning before the 30-second timer runs out.</p>
+            <div class="game-hud">
+                <div class="hud-chip">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1l1.1 2.3 2.6.4-1.9 1.8.45 2.6L6 7l-2.25 1.1.45-2.6L2.3 3.7l2.6-.4z" fill="#F59E0B"/></svg>
+                    <span id="gameScore">0</span> pts
+                </div>
+                <div class="hud-bar"><div class="hud-bar-fill" id="timerBar" style="width:100%"></div></div>
+                <div class="hud-chip">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6.5" r="4.5" stroke="#6366F1" stroke-width="1.3"/><path d="M6 4v2.5l1.5 1" stroke="#6366F1" stroke-width="1.3" stroke-linecap="round"/><path d="M4 1.5h4" stroke="#6366F1" stroke-width="1.3" stroke-linecap="round"/></svg>
+                    <span id="gameTimer">30</span>s
+                </div>
+            </div>
+            <div class="word-display">
+                <div class="word-main" id="gameWord">—</div>
+                <div class="word-hint">What does this mean in English?</div>
+            </div>
+            <div class="game-options" id="gameOptions"></div>
+        </div>
+        <div id="gameOver" class="hidden">
+            <div class="game-over-card">
+                <div class="go-icon">
+                    <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+                        <path d="M7 4h12v10a6 6 0 01-12 0V4z" stroke="#6366F1" stroke-width="1.8" stroke-linejoin="round"/>
+                        <path d="M7 8H4.5A2.5 2.5 0 007 10.5M19 8h2.5A2.5 2.5 0 0119 10.5" stroke="#6366F1" stroke-width="1.6" stroke-linecap="round"/>
+                        <path d="M13 18v4M10 22h6" stroke="#6366F1" stroke-width="1.6" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="go-title">Race over!</div>
+                <div class="go-score" id="finalScore">0</div>
+                <div class="go-sub">XP earned this round</div>
+                <button class="btn-replay" onclick="startVocabGame()">Play again →</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- PICTURE MATCHING MODAL -->
+<div class="modal" id="pictureModal">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closePicGame()">✕</button>
+        <div id="picGameArea">
+            <div class="modal-eyebrow">
+                <div class="modal-eyebrow-icon">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <rect x="1.5" y="1.5" width="11" height="11" rx="2" stroke="#6366F1" stroke-width="1.4"/>
+                        <circle cx="4.5" cy="4.5" r="1" fill="#6366F1"/>
+                        <path d="M1.5 9.5l3-2.5 2.5 2 2-1.5 4.5 3.5" stroke="#6366F1" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                Picture Matching
+            </div>
+            <h2>Name what you see.</h2>
+            <p class="modal-sub">Tap the correct Kyrgyz word for the photo.</p>
+            <div class="game-hud">
+                <div class="hud-chip">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1l1.1 2.3 2.6.4-1.9 1.8.45 2.6L6 7l-2.25 1.1.45-2.6L2.3 3.7l2.6-.4z" fill="#F59E0B"/></svg>
+                    <span id="picScore">0</span> pts
+                </div>
+                <div class="hud-bar"></div>
+                <div class="hud-chip">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1.5" y="1.5" width="9" height="9" rx="1.5" stroke="#6366F1" stroke-width="1.3"/><path d="M4 6h4M6 4v4" stroke="#6366F1" stroke-width="1.2" stroke-linecap="round"/></svg>
+                    <span id="picLeft">8</span> left
+                </div>
+            </div>
+            <div class="pic-frame">
+                <img id="picImg" src="" alt="" loading="eager"/>
+                <div class="pic-label" id="picHint"></div>
+            </div>
+            <div class="game-options" id="picOptions"></div>
+        </div>
+        <div id="picGameOver" class="hidden">
+            <div class="game-over-card">
+                <div class="go-icon">
+                    <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+                        <rect x="3" y="3" width="20" height="20" rx="4" stroke="#6366F1" stroke-width="1.8"/>
+                        <circle cx="9" cy="9" r="2" fill="#6366F1" opacity=".5"/>
+                        <path d="M3 18l6-5.5 5 4 4-3 8 6" stroke="#6366F1" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="go-title">Well done!</div>
+                <div class="go-score" id="picFinalScore">0</div>
+                <div class="go-sub">XP earned this round</div>
+                <button class="btn-replay" onclick="startPicGame()">Play again →</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+const vocabData=[
+    {word:'Салам',answer:'Hello',options:['Hello','Mountain','Water','Thank you']},
+    {word:'Рахмат',answer:'Thank you',options:['Goodbye','Thank you','Sorry','Please']},
+    {word:'Суу',answer:'Water',options:['Fire','Wind','Water','Earth']},
+    {word:'Тоо',answer:'Mountain',options:['River','Lake','Mountain','Valley']},
+    {word:'Үй',answer:'House',options:['School','House','Market','Road']},
+    {word:'Дос',answer:'Friend',options:['Enemy','Teacher','Friend','Brother']},
+    {word:'Ата',answer:'Father',options:['Mother','Father','Sister','Uncle']},
+    {word:'Апа',answer:'Mother',options:['Mother','Father','Aunt','Grandmother']},
+    {word:'Кыргызстан',answer:'Kyrgyzstan',options:['Kazakhstan','Uzbekistan','Kyrgyzstan','Tajikistan']},
+    {word:'Тамак',answer:'Food',options:['Drink','Food','Fruit','Meat']},
+];
+let gameScore=0,gameTimerVal=30,timerInterval=null,currentQ=null;
+
+function openGame(type){
+    if(type==='vocab'){document.getElementById('vocabModal').classList.add('active');startVocabGame();}
+    else if(type==='picture'){document.getElementById('pictureModal').classList.add('active');startPicGame();}
+    else alert('This game is coming soon!');
+}
+function closeVocabGame(){document.getElementById('vocabModal').classList.remove('active');clearInterval(timerInterval);}
+function startVocabGame(){
+    gameScore=0;gameTimerVal=30;
+    document.getElementById('gameScore').textContent=0;
+    document.getElementById('gameOver').classList.add('hidden');
+    document.getElementById('gameArea').style.display='';
+    const bar=document.getElementById('timerBar');
+    bar.style.transition='none';bar.style.width='100%';bar.style.background='#6366F1';
+    clearInterval(timerInterval);
+    timerInterval=setInterval(()=>{
+        gameTimerVal--;
+        document.getElementById('gameTimer').textContent=gameTimerVal;
+        const pct=(gameTimerVal/30)*100;
+        bar.style.transition='width 1s linear';bar.style.width=pct+'%';
+        if(pct<30)bar.style.background='#F59E0B';
+        if(pct<15)bar.style.background='#EF4444';
+        if(gameTimerVal<=0){clearInterval(timerInterval);endVocabGame();}
+    },1000);
+    nextVocabQuestion();
+}
+function nextVocabQuestion(){
+    currentQ=vocabData[Math.floor(Math.random()*vocabData.length)];
+    document.getElementById('gameWord').textContent=currentQ.word;
+    const opts=document.getElementById('gameOptions');opts.innerHTML='';
+    [...currentQ.options].sort(()=>Math.random()-.5).forEach(opt=>{
+        const b=document.createElement('button');b.className='option-btn';b.textContent=opt;
+        b.onclick=()=>checkVocabAnswer(opt,b);opts.appendChild(b);
+    });
+}
+function checkVocabAnswer(selected,btn){
+    document.querySelectorAll('#gameOptions .option-btn').forEach(b=>b.onclick=null);
+    if(selected===currentQ.answer){
+        btn.classList.add('correct');gameScore+=10;
+        document.getElementById('gameScore').textContent=gameScore;
+        setTimeout(nextVocabQuestion,500);
+    } else {
+        btn.classList.add('wrong');
+        document.querySelectorAll('#gameOptions .option-btn').forEach(b=>{if(b.textContent===currentQ.answer)b.classList.add('correct');});
+        setTimeout(nextVocabQuestion,900);
+    }
+}
+function endVocabGame(){
+    document.getElementById('gameArea').style.display='none';
+    document.getElementById('gameOver').classList.remove('hidden');
+    document.getElementById('finalScore').textContent=gameScore+' XP';
+    fetch('/api/add_points',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({points:gameScore})});
+}
+
+const picData=[
+    {img:'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=700&q=75',word:'Тоо',hint:'mountain',options:['Тоо','Суу','Үй','Дос']},
+    {img:'https://images.unsplash.com/photo-1559825481-12a05cc00344?w=700&q=75',word:'Суу',hint:'water',options:['Тоо','Суу','Тамак','Апа']},
+    {img:'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=700&q=75',word:'Үй',hint:'house',options:['Дос','Рахмат','Үй','Ата']},
+    {img:'https://images.unsplash.com/photo-1662454455070-a21dc0feedcd?w=700&q=75',word:'Ата',hint:'father',options:['Апа','Ата','Дос','Суу']},
+    {img:'https://plus.unsplash.com/premium_photo-1679398793928-c03372778874?w=700&q=75',word:'Апа',hint:'mother',options:['Апа','Ата','Тоо','Үй']},
+    {img:'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=700&q=75',word:'Дос',hint:'friends',options:['Суу','Тамак','Тоо','Дос']},
+    {img:'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=700&q=75',word:'Тамак',hint:'food',options:['Тамак','Дос','Үй','Ата']},
+    {img:'https://plus.unsplash.com/premium_photo-1687203673190-d39c3719123a?w=700&q=75',word:'Салам',hint:'greeting',options:['Рахмат','Салам','Суу','Апа']},
+];
+let picScore=0,picLeft=8,picQueue=[];
+
+function startPicGame(){
+    picScore=0;picLeft=8;picQueue=[...picData].sort(()=>Math.random()-.5);
+    document.getElementById('picScore').textContent=0;
+    document.getElementById('picLeft').textContent=8;
+    document.getElementById('picGameOver').classList.add('hidden');
+    document.getElementById('picGameArea').style.display='';
+    nextPicQuestion();
+}
+function nextPicQuestion(){
+    if(picQueue.length===0){endPicGame();return;}
+    const q=picQueue.shift();
+    const img=document.getElementById('picImg');
+    img.style.opacity=0;img.src=q.img;
+    img.onload=()=>{img.style.opacity=1;};
+    document.getElementById('picHint').textContent=q.hint;
+    const opts=document.getElementById('picOptions');opts.innerHTML='';
+    [...q.options].sort(()=>Math.random()-.5).forEach(opt=>{
+        const b=document.createElement('button');b.className='option-btn';b.textContent=opt;
+        b.onclick=()=>{
+            document.querySelectorAll('#picOptions .option-btn').forEach(x=>x.onclick=null);
+            if(opt===q.word){b.classList.add('correct');picScore+=10;}
+            else{b.classList.add('wrong');document.querySelectorAll('#picOptions .option-btn').forEach(x=>{if(x.textContent===q.word)x.classList.add('correct');});}
+            document.getElementById('picScore').textContent=picScore;
+            picLeft--;document.getElementById('picLeft').textContent=picLeft;
+            setTimeout(nextPicQuestion,800);
+        };
+        opts.appendChild(b);
+    });
+}
+function endPicGame(){
+    document.getElementById('picGameArea').style.display='none';
+    document.getElementById('picGameOver').classList.remove('hidden');
+    document.getElementById('picFinalScore').textContent=picScore+' XP';
+    fetch('/api/add_points',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({points:picScore})});
+}
+function closePicGame(){document.getElementById('pictureModal').classList.remove('active');}
+
+document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{
+    if(e.target===m){m.classList.remove('active');clearInterval(timerInterval);}
+}));
+</script>
+{% endblock %}

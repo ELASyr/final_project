@@ -1,0 +1,1391 @@
+{% extends "base.html" %}
+{% block title %}Practice{% endblock %}
+
+{% block extra_css %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+*, *::before, *::after { box-sizing: border-box; }
+.prac { max-width: 960px; font-family: 'Inter', sans-serif; }
+
+/* ── HERO ──────────────────────────────────────── */
+.prac-hero {
+    border-radius: 16px; overflow: hidden; min-height: 280px;
+    display: flex; align-items: flex-end; margin-bottom: 2rem; position: relative;
+    background:
+        linear-gradient(to right, rgba(4,8,18,.88) 0%, rgba(4,8,18,.52) 55%, rgba(4,8,18,.08) 100%),
+        url('https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=1400&q=80') center/cover no-repeat;
+}
+.prac-hero-body { padding: 2.2rem 2.5rem; max-width: 480px; position: relative; z-index: 1; }
+.prac-hero-tag { font-size: .63rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.45); margin-bottom: .5rem; }
+.prac-hero-body h1 { font-size: 2rem; font-weight: 700; color: white; line-height: 1.22; letter-spacing: -.5px; margin-bottom: .6rem; }
+.prac-hero-body p  { font-size: .85rem; color: rgba(255,255,255,.5); line-height: 1.7; margin-bottom: 1.3rem; max-width: 380px; }
+.prac-hero-actions { display: flex; gap: .5rem; align-items: center; }
+.ph-btn {
+    background: white; color: #0F0F0F; border: none;
+    font-family: 'Inter', sans-serif; font-size: .8rem; font-weight: 600;
+    padding: 8px 18px; border-radius: 7px; cursor: pointer; transition: opacity .15s;
+}
+.ph-btn:hover { opacity: .85; }
+.ph-streak {
+    display: flex; align-items: center; gap: .4rem;
+    background: rgba(255,255,255,.1); backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,.14); border-radius: 99px;
+    padding: .35rem .8rem; font-size: .74rem; font-weight: 600; color: white;
+}
+.ph-streak-dot { width: 6px; height: 6px; border-radius: 50%; background: #F59E0B; }
+
+/* ── SECTION ────────────────────────────────────── */
+.prac-section { margin-bottom: 2rem; }
+.sec-label { font-size: .63rem; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; color: #94A3B8; margin: 0 0 .8rem; }
+
+/* ── VOCAB ROW (flashcards + learn by heart) ──── */
+.vocab-row { display: grid; grid-template-columns: 1fr 1fr; gap: .85rem; }
+.vcard {
+    background: white; border-radius: 13px; border: 1px solid #EAECF2;
+    padding: 1.2rem 1.3rem; cursor: pointer; transition: all .18s;
+}
+.vcard:hover { border-color: rgba(99,102,241,.22); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99,102,241,.07); }
+.vc-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: .9rem; }
+.vc-icon-box { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+.vc-flash .vc-icon-box { background: #FFFBEB; }
+.vc-heart .vc-icon-box { background: #FFF1F2; }
+.vc-count { font-size: .7rem; font-weight: 700; color: #94A3B8; background: #F8F9FB; padding: 2px 8px; border-radius: 99px; }
+.vc-title { font-size: .9rem; font-weight: 700; color: #0F172A; margin-bottom: .15rem; }
+.vc-desc  { font-size: .73rem; color: #94A3B8; line-height: 1.5; margin-bottom: .9rem; }
+.vc-btn {
+    font-family: 'Inter', sans-serif; font-size: .74rem; font-weight: 600;
+    padding: 6px 14px; border-radius: 7px; border: none; cursor: pointer; transition: all .13s;
+}
+.vc-flash .vc-btn { background: #FFFBEB; color: #B45309; }
+.vc-heart .vc-btn { background: #FFF1F2; color: #E11D48; }
+.vc-flash .vc-btn:hover { background: #F59E0B; color: white; }
+.vc-heart .vc-btn:hover { background: #E11D48; color: white; }
+
+/* ── SKILLS ROW (writing + grammar) ────────────── */
+.skills-row { display: grid; grid-template-columns: 1fr 1fr; gap: .85rem; }
+.skill-card {
+    background: white; border-radius: 13px; border: 1px solid #EAECF2;
+    padding: 1.25rem 1.35rem; cursor: pointer; transition: all .18s; position: relative; overflow: hidden;
+}
+.skill-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.06); }
+.sk-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: .85rem; }
+.sk-icon-box { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+.sk-writing .sk-icon-box { background: #FFFBEB; }
+.sk-grammar .sk-icon-box { background: #F0FDFA; }
+.sk-badge { font-size: .58rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 2px 7px; border-radius: 99px; }
+.sk-writing .sk-badge { background: #FEF9C3; color: #B45309; }
+.sk-grammar .sk-badge { background: #CCFBF1; color: #0F766E; }
+.sk-title { font-size: .95rem; font-weight: 700; color: #0F172A; letter-spacing: -.1px; margin-bottom: .18rem; }
+.sk-desc  { font-size: .74rem; color: #94A3B8; line-height: 1.5; margin-bottom: .85rem; }
+.sk-bar   { height: 3px; background: #F1F3F6; border-radius: 99px; overflow: hidden; margin-bottom: .5rem; }
+.sk-bar-fill { height: 100%; border-radius: 99px; }
+.sk-writing .sk-bar-fill { background: #F59E0B; }
+.sk-grammar .sk-bar-fill { background: #14B8A6; }
+.sk-foot  { display: flex; align-items: center; justify-content: space-between; }
+.sk-prog  { font-size: .67rem; color: #C4C9D4; font-weight: 500; }
+.sk-btn {
+    font-family: 'Inter', sans-serif; font-size: .74rem; font-weight: 600;
+    padding: 6px 13px; border-radius: 7px; border: none; cursor: pointer; transition: all .13s;
+}
+.sk-writing .sk-btn { background: #FFFBEB; color: #B45309; }
+.sk-grammar .sk-btn { background: #F0FDFA; color: #0F766E; }
+.sk-writing .sk-btn:hover { background: #F59E0B; color: white; }
+.sk-grammar .sk-btn:hover { background: #14B8A6; color: white; }
+
+/* ── TOPIC QUIZZES ──────────────────────────────── */
+.topics-row { display: grid; grid-template-columns: repeat(4,1fr); gap: .75rem; }
+.topic-card {
+    background: white; border-radius: 13px; border: 1px solid #EAECF2;
+    padding: 1.1rem 1.15rem; cursor: pointer; transition: all .18s;
+}
+.topic-card:hover { border-color: rgba(99,102,241,.22); transform: translateY(-2px); box-shadow: 0 6px 18px rgba(99,102,241,.07); }
+.tc-icon-box { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; margin-bottom: .65rem; }
+.tc-family   .tc-icon-box { background: #FFF1F2; }
+.tc-shopping .tc-icon-box { background: #F0F9FF; }
+.tc-weather  .tc-icon-box { background: #FFFBEB; }
+.tc-dir      .tc-icon-box { background: #F0FDFA; }
+.tc-title { font-size: .84rem; font-weight: 700; color: #0F172A; margin-bottom: .18rem; }
+.tc-meta  { font-size: .67rem; color: #94A3B8; }
+.tc-bar   { height: 2px; background: #F1F3F6; border-radius: 99px; overflow: hidden; margin-top: .7rem; }
+.tc-bar-fill { height: 100%; border-radius: 99px; }
+.tc-family  .tc-bar-fill { background: #F43F5E; }
+.tc-shopping .tc-bar-fill { background: #0EA5E9; }
+.tc-weather  .tc-bar-fill { background: #F59E0B; }
+.tc-dir      .tc-bar-fill { background: #14B8A6; }
+.tc-score { font-size: .67rem; color: #C4C9D4; margin-top: .35rem; }
+
+/* ── TRANSLATOR ─────────────────────────────────── */
+.tr-card { background: white; border-radius: 14px; border: 1px solid #EAECF2; overflow: hidden; }
+.tr-head { display: flex; align-items: center; gap: .7rem; padding: 1rem 1.3rem; border-bottom: 1px solid #F1F3F6; }
+.tr-icon { width: 32px; height: 32px; border-radius: 8px; background: #EEF2FF; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.tr-htitle { font-size: .86rem; font-weight: 700; color: #0F172A; }
+.tr-hsub   { font-size: .68rem; color: #94A3B8; margin-top: 1px; }
+.dtabs { display: flex; padding: 0 1.3rem; border-bottom: 1px solid #F1F3F6; background: #FAFBFF; }
+.dtab {
+    padding: .6rem .85rem; font-family: 'Inter', sans-serif;
+    font-size: .72rem; font-weight: 600; color: #94A3B8;
+    border: none; background: none; cursor: pointer;
+    border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all .15s;
+}
+.dtab:hover { color: #6366F1; }
+.dtab.active { color: #6366F1; border-bottom-color: #6366F1; }
+.dtab[data-d="south"].active { color:#B45309; border-bottom-color:#F59E0B; }
+.dtab[data-d="talas"].active { color:#0F766E; border-bottom-color:#14B8A6; }
+.dtab[data-d="issyk"].active { color:#0284C7; border-bottom-color:#0EA5E9; }
+.dtab[data-d="naryn"].active { color:#7C3AED; border-bottom-color:#8B5CF6; }
+.dtab[data-d="chui"].active  { color:#DC2626; border-bottom-color:#EF4444; }
+.tr-body { padding: 1rem 1.3rem; }
+.tr-panels { display: grid; grid-template-columns: 1fr 32px 1fr; gap: .5rem; align-items: start; margin-bottom: .8rem; }
+.tr-col { display: flex; flex-direction: column; }
+.tr-clbl {
+    display: flex; align-items: center; gap: .35rem;
+    font-size: .6rem; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; color: #94A3B8; margin-bottom: .38rem;
+}
+.tr-dpill { font-size: .58rem; font-weight: 700; padding: 2px 6px; border-radius: 99px; }
+.pill-s { background:#FFFBEB; color:#B45309; }
+.pill-t { background:#CCFBF1; color:#0F766E; }
+.pill-i { background:#E0F2FE; color:#0284C7; }
+.pill-n { background:#F5F3FF; color:#7C3AED; }
+.pill-c { background:#FEF2F2; color:#DC2626; }
+.pill-std { background:#EEF2FF; color:#4F46E5; }
+.tr-textarea {
+    border: 1px solid #EAECF2; border-radius: 9px; padding: .7rem .85rem;
+    font-family: 'Inter', sans-serif; font-size: .86rem; color: #374151;
+    outline: none; resize: none; transition: border .15s; min-height: 80px; line-height: 1.6;
+}
+.tr-textarea:focus { border-color: #6366F1; box-shadow: 0 0 0 3px rgba(99,102,241,.06); }
+.tr-arrow-mid { display: flex; align-items: center; justify-content: center; padding-top: 1.4rem; }
+.tr-arrow-box { width: 26px; height: 26px; border-radius: 7px; background: #F8F9FB; border: 1px solid #EAECF2; display: flex; align-items: center; justify-content: center; }
+.tr-out {
+    border: 1px solid #EAECF2; border-radius: 9px; padding: .7rem .85rem;
+    font-family: 'Inter', sans-serif; font-size: .86rem; color: #C4C9D4;
+    background: #FAFBFF; min-height: 80px; line-height: 1.6;
+}
+.tr-out.has-text { color: #374151; background: white; }
+.tr-meta { display: none; align-items: center; gap: .45rem; padding: .55rem .7rem; background: #F8F9FB; border-radius: 8px; border: 1px solid #EAECF2; margin-bottom: .8rem; }
+.tr-meta.show { display: flex; }
+.trm-dot { width: 5px; height: 5px; border-radius: 50%; background: #22C55E; flex-shrink: 0; }
+.trm-text { font-size: .72rem; color: #374151; font-weight: 500; }
+.trm-badge { font-size: .6rem; font-weight: 700; padding: 2px 7px; border-radius: 99px; margin-left: auto; }
+.tr-chips { display: flex; flex-wrap: wrap; gap: .38rem; margin-bottom: .8rem; }
+.tw-chip {
+    padding: .25rem .65rem; border-radius: 99px; font-size: .72rem;
+    font-weight: 600; cursor: pointer; transition: opacity .13s; border: 1.5px solid transparent;
+}
+.tw-chip:hover { opacity: .75; }
+.tr-foot { display: flex; align-items: center; justify-content: space-between; }
+.tr-hint { font-size: .68rem; color: #C4C9D4; }
+.tr-btn {
+    background: #0F172A; color: white; border: none;
+    font-family: 'Inter', sans-serif; font-size: .78rem; font-weight: 600;
+    padding: 8px 18px; border-radius: 8px; cursor: pointer; transition: opacity .15s;
+}
+.tr-btn:hover { opacity: .82; }
+
+/* ── MODALS ─────────────────────────────────────── */
+.modal-ov {
+    display: none; position: fixed; inset: 0; z-index: 700;
+    background: rgba(8,8,20,.55); backdrop-filter: blur(7px);
+    align-items: center; justify-content: center; padding: 1rem;
+}
+.modal-ov.open { display: flex; }
+.modal-box {
+    background: white; border-radius: 16px; width: 100%; max-width: 560px;
+    max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 24px 60px rgba(0,0,0,.14); position: relative;
+    animation: mUp .22s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes mUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+.modal-close {
+    position: absolute; top: .9rem; right: .9rem;
+    width: 28px; height: 28px; border-radius: 7px;
+    border: 1px solid #E5E7EB; background: white; cursor: pointer;
+    font-size: .7rem; color: #9CA3AF; display: flex; align-items: center; justify-content: center;
+    transition: all .13s; z-index: 2;
+}
+.modal-close:hover { background: #F9FAFB; color: #374151; }
+.modal-inner { padding: 1.5rem; }
+.modal-tag { font-size: .6rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #6366F1; margin-bottom: .4rem; }
+.modal-title { font-size: 1.15rem; font-weight: 700; color: #0F172A; letter-spacing: -.2px; margin-bottom: .25rem; }
+.modal-sub { font-size: .78rem; color: #94A3B8; margin-bottom: 1.25rem; line-height: 1.5; }
+
+/* ── FLASHCARD WIDGET ───────────────────────────── */
+.fc-progress-row { display: flex; align-items: center; gap: .65rem; margin-bottom: 1.1rem; }
+.fc-prog-bar { flex: 1; height: 3px; background: #F1F3F6; border-radius: 99px; overflow: hidden; }
+.fc-prog-fill { height: 100%; background: #6366F1; border-radius: 99px; transition: width .3s; }
+.fc-counter { font-size: .72rem; font-weight: 700; color: #94A3B8; white-space: nowrap; }
+/* flashcard wrapper — perspective must be on PARENT, not the flipping element */
+.fc-scene {
+    perspective: 1200px;
+    height: 260px; margin-bottom: 1rem; cursor: pointer; user-select: none;
+}
+.flashcard {
+    width: 100%; height: 100%;
+    position: relative; transform-style: preserve-3d;
+    transition: transform .55s cubic-bezier(.4,0,.2,1);
+}
+.flashcard.flipped { transform: rotateY(180deg); }
+.fc-face {
+    position: absolute; inset: 0;
+    backface-visibility: hidden; -webkit-backface-visibility: hidden;
+    border-radius: 13px; overflow: hidden;
+    display: flex; flex-direction: column;
+}
+/* FRONT */
+.fc-front { background: #0F0F1A; border: 1px solid rgba(99,102,241,.18); }
+.fc-front::before {
+    content: ''; position: absolute; inset: 0; border-radius: 13px; pointer-events: none;
+    background: radial-gradient(ellipse at 70% 30%, rgba(99,102,241,.22), transparent 60%);
+}
+/* BACK — must be pre-rotated 180° so it faces the other way */
+.fc-back {
+    background: white; border: 1px solid #EAECF2;
+    transform: rotateY(180deg);
+}
+
+/* FRONT content */
+.fc-front-photo { flex-shrink: 0; height: 120px; overflow: hidden; position: relative; }
+.fc-front-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.fc-front-photo-ph {
+    height: 120px; background: #1a1a2e; display: flex; align-items: center; justify-content: center;
+}
+.fc-front-body { padding: .9rem 1.2rem; flex: 1; display: flex; flex-direction: column; justify-content: center; position: relative; z-index: 1; }
+.fc-kyrgyz { font-size: 1.65rem; font-weight: 700; color: white; letter-spacing: -.3px; margin-bottom: .25rem; }
+.fc-tap-hint { font-size: .68rem; color: rgba(255,255,255,.25); }
+
+/* BACK content */
+.fc-back-photo { flex-shrink: 0; height: 90px; overflow: hidden; }
+.fc-back-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.fc-back-photo-ph { height: 90px; background: #F1F5F9; display: flex; align-items: center; justify-content: center; }
+.fc-back-body { padding: .85rem 1.1rem; flex: 1; display: flex; flex-direction: column; justify-content: center; gap: .3rem; }
+.fc-english { font-size: 1.25rem; font-weight: 700; color: #0F172A; letter-spacing: -.2px; }
+.fc-pronunciation { font-size: .78rem; color: #94A3B8; font-style: italic; }
+.fc-example { background: #F8F9FB; border-radius: 8px; padding: .5rem .7rem; margin-top: .2rem; }
+.fc-ex-ky { font-size: .78rem; color: #374151; margin-bottom: .12rem; font-weight: 500; }
+.fc-ex-en { font-size: .7rem; color: #94A3B8; font-style: italic; }
+.fc-actions { display: flex; gap: .5rem; }
+.fc-act-btn {
+    flex: 1; padding: 9px; border-radius: 9px; border: 1.5px solid #EAECF2;
+    background: white; font-family: 'Inter', sans-serif; font-size: .78rem; font-weight: 600;
+    cursor: pointer; transition: all .13s; display: flex; align-items: center; justify-content: center; gap: .35rem;
+}
+.fc-act-btn.wrong:hover  { background: #FEF2F2; border-color: #EF4444; color: #DC2626; }
+.fc-act-btn.right:hover  { background: #DCFCE7; border-color: #22C55E; color: #15803D; }
+.fc-act-btn.skip:hover   { background: #F8F9FB; border-color: #C4C9D4; color: #94A3B8; }
+
+/* ── LEARN BY HEART ─────────────────────────────── */
+.lbh-sets { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; margin-bottom: 1rem; }
+.lbh-set {
+    padding: .75rem .9rem; border-radius: 10px; border: 1.5px solid #EAECF2;
+    cursor: pointer; transition: all .13s; background: white;
+}
+.lbh-set:hover { border-color: #6366F1; background: #F5F4FF; }
+.lbh-set.active { border-color: #6366F1; background: #EEF2FF; }
+.lbh-set-name { font-size: .84rem; font-weight: 700; color: #0F172A; margin-bottom: .12rem; }
+.lbh-set-meta { font-size: .68rem; color: #94A3B8; }
+.lbh-word-list { display: flex; flex-direction: column; gap: .4rem; max-height: 280px; overflow-y: auto; }
+.lbh-word-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: .6rem .75rem; border-radius: 9px; border: 1px solid #EAECF2; background: white;
+}
+.lbh-ky   { font-size: .86rem; font-weight: 700; color: #0F172A; }
+.lbh-en   { font-size: .8rem; color: #6366F1; font-weight: 500; }
+.lbh-pron { font-size: .68rem; color: #C4C9D4; font-style: italic; }
+
+/* ── WRITING MODAL ──────────────────────────────── */
+.writing-prompt {
+    background: #F8F9FB; border-radius: 10px; border: 1px solid #EAECF2;
+    padding: .85rem 1rem; margin-bottom: .9rem;
+}
+.wp-num { font-size: .62rem; font-weight: 700; color: #94A3B8; letter-spacing: .07em; text-transform: uppercase; margin-bottom: .3rem; }
+.wp-text { font-size: .95rem; font-weight: 600; color: #0F172A; line-height: 1.45; }
+.wp-answer {
+    width: 100%; border: 1.5px solid #EAECF2; border-radius: 9px; padding: .7rem .85rem;
+    font-family: 'Inter', sans-serif; font-size: .9rem; color: #374151;
+    outline: none; resize: none; transition: border .15s; margin-bottom: .55rem;
+}
+.wp-answer:focus { border-color: #6366F1; box-shadow: 0 0 0 3px rgba(99,102,241,.06); }
+.wp-check-btn {
+    width: 100%; padding: 9px; border-radius: 9px; border: none;
+    background: #0F172A; color: white; font-family: 'Inter', sans-serif;
+    font-size: .82rem; font-weight: 600; cursor: pointer; transition: opacity .15s; margin-bottom: .65rem;
+}
+.wp-check-btn:hover { opacity: .85; }
+.wp-result { display: none; padding: .7rem .9rem; border-radius: 9px; margin-bottom: .6rem; }
+.wp-result.correct { background: #DCFCE7; border: 1px solid #86EFAC; }
+.wp-result.wrong   { background: #FEE2E2; border: 1px solid #FCA5A5; }
+.wp-result-text { font-size: .82rem; font-weight: 600; }
+.wp-result.correct .wp-result-text { color: #15803D; }
+.wp-result.wrong   .wp-result-text { color: #B91C1C; }
+.wp-nav { display: flex; justify-content: space-between; align-items: center; }
+.wp-indicator { font-size: .72rem; color: #94A3B8; }
+.wp-next-btn {
+    padding: 8px 18px; border-radius: 8px; border: none;
+    background: #6366F1; color: white; font-family: 'Inter', sans-serif;
+    font-size: .78rem; font-weight: 600; cursor: pointer; transition: opacity .15s; display: none;
+}
+.wp-next-btn:hover { opacity: .85; }
+
+/* ── GRAMMAR MODAL ──────────────────────────────── */
+.grammar-tabs { display: flex; gap: .4rem; margin-bottom: 1rem; flex-wrap: wrap; }
+.gram-tab {
+    padding: .35rem .85rem; border-radius: 99px; border: 1.5px solid #EAECF2;
+    font-family: 'Inter', sans-serif; font-size: .74rem; font-weight: 600;
+    color: #94A3B8; background: white; cursor: pointer; transition: all .13s;
+}
+.gram-tab.active, .gram-tab:hover { background: #EEF2FF; border-color: #6366F1; color: #4F46E5; }
+.grammar-lesson { display: none; }
+.grammar-lesson.active { display: block; }
+.gram-rule {
+    background: #F8F9FB; border-radius: 10px; border: 1px solid #EAECF2;
+    padding: .85rem 1rem; margin-bottom: .75rem;
+}
+.gram-rule-title { font-size: .82rem; font-weight: 700; color: #0F172A; margin-bottom: .35rem; }
+.gram-rule-text  { font-size: .8rem; color: #374151; line-height: 1.65; }
+.gram-examples { display: flex; flex-direction: column; gap: .4rem; margin-top: .65rem; }
+.gram-ex { display: flex; align-items: flex-start; gap: .65rem; padding: .55rem .7rem; background: white; border-radius: 8px; border: 1px solid #EAECF2; }
+.gram-ex-ky { font-size: .84rem; font-weight: 700; color: #6366F1; min-width: 120px; flex-shrink: 0; }
+.gram-ex-en { font-size: .8rem; color: #374151; }
+.gram-quiz { margin-top: .75rem; }
+.gram-q-text { font-size: .88rem; font-weight: 600; color: #0F172A; margin-bottom: .65rem; }
+.gram-opts { display: grid; grid-template-columns: 1fr 1fr; gap: .4rem; }
+.gram-opt {
+    padding: .65rem .8rem; border-radius: 9px; border: 1.5px solid #EAECF2;
+    background: white; font-family: 'Inter', sans-serif; font-size: .82rem; font-weight: 600;
+    color: #374151; cursor: pointer; transition: all .13s; text-align: center;
+}
+.gram-opt:hover:not(.correct):not(.wrong) { border-color: #6366F1; background: #EEF2FF; color: #4F46E5; }
+.gram-opt.correct { background: #DCFCE7; border-color: #22C55E; color: #15803D; }
+.gram-opt.wrong   { background: #FEE2E2; border-color: #EF4444; color: #B91C1C; }
+
+/* ── QUIZ MODAL ─────────────────────────────────── */
+.quiz-q-display {
+    background: #0F0F1A; border-radius: 12px; padding: 1.3rem;
+    text-align: center; margin-bottom: 1rem; border: 1px solid rgba(99,102,241,.15);
+}
+.quiz-q-img { width: 100%; max-height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: .65rem; display: none; }
+.quiz-q-text { font-size: 1.35rem; font-weight: 700; color: white; letter-spacing: -.2px; }
+.quiz-q-sub  { font-size: .72rem; color: rgba(255,255,255,.3); margin-top: .25rem; }
+.quiz-opts { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin-bottom: 1rem; }
+.quiz-opt {
+    padding: .8rem; border-radius: 10px; border: 1.5px solid #EAECF2;
+    background: white; font-family: 'Inter', sans-serif; font-size: .84rem; font-weight: 600;
+    color: #374151; cursor: pointer; transition: all .13s; text-align: center;
+}
+.quiz-opt:hover:not(.correct):not(.wrong) { border-color: #6366F1; background: #EEF2FF; color: #4F46E5; }
+.quiz-opt.correct { background: #DCFCE7; border-color: #22C55E; color: #15803D; }
+.quiz-opt.wrong   { background: #FEE2E2; border-color: #EF4444; color: #B91C1C; }
+.quiz-hud { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.quiz-score-chip { display: flex; align-items: center; gap: .35rem; background: #F8F9FB; border-radius: 99px; padding: .3rem .75rem; font-size: .74rem; font-weight: 700; color: #374151; }
+.quiz-prog { flex: 1; height: 3px; background: #F1F3F6; border-radius: 99px; overflow: hidden; margin: 0 .75rem; }
+.quiz-prog-fill { height: 100%; background: #6366F1; border-radius: 99px; transition: width .25s; }
+.quiz-done { text-align: center; padding: 1rem 0 .5rem; }
+.quiz-done-score { font-size: 2.2rem; font-weight: 700; color: #6366F1; letter-spacing: -.5px; line-height: 1; margin-bottom: .2rem; }
+.quiz-done-sub { font-size: .78rem; color: #94A3B8; margin-bottom: 1.25rem; }
+.btn-replay {
+    width: 100%; padding: 10px; border-radius: 9px; border: none;
+    background: #0F172A; color: white; font-family: 'Inter', sans-serif;
+    font-size: .82rem; font-weight: 600; cursor: pointer; transition: opacity .15s;
+}
+.btn-replay:hover { opacity: .85; }
+
+@media(max-width:768px){
+    .vocab-row, .skills-row { grid-template-columns: 1fr; }
+    .topics-row { grid-template-columns: 1fr 1fr; }
+    .tr-panels  { grid-template-columns: 1fr; }
+    .tr-arrow-mid { display: none; }
+    .lbh-sets { grid-template-columns: 1fr; }
+    .gram-opts, .quiz-opts { grid-template-columns: 1fr; }
+}
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="page-container prac">
+
+    <!-- HERO -->
+    <section class="prac-hero">
+        <div class="prac-hero-body">
+            <div class="prac-hero-tag">Practice & reinforce</div>
+            <h1>Practice makes it stick.</h1>
+            <p>Flashcards, quizzes, grammar and writing — everything you need to lock in what you've learned.</p>
+            <div class="prac-hero-actions">
+                <button class="ph-btn" onclick="openModal('flashcardsModal')">Start flashcards →</button>
+                <div class="ph-streak"><div class="ph-streak-dot"></div>{{ stats.day_streak if stats else 0 }} day streak</div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- VOCABULARY -->
+    <div class="prac-section">
+        <div class="sec-label">Vocabulary</div>
+        <div class="vocab-row">
+
+            <div class="vcard vc-flash" onclick="openModal('flashcardsModal')">
+                <div class="vc-head">
+                    <div class="vc-icon-box">
+                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                            <rect x="2" y="2" width="14" height="14" rx="3" stroke="#B45309" stroke-width="1.5"/>
+                            <path d="M6 9h6M9 6v6" stroke="#B45309" stroke-width="1.4" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <span class="vc-count">10 cards</span>
+                </div>
+                <div class="vc-title">Flashcards</div>
+                <div class="vc-desc">Flip-card review with photos. See Kyrgyz, guess the meaning, then reveal.</div>
+                <button class="vc-btn">Open →</button>
+            </div>
+
+            <div class="vcard vc-heart" onclick="openModal('learnModal')">
+                <div class="vc-head">
+                    <div class="vc-icon-box">
+                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                            <path d="M9 15s-6-4.5-6-8.5a4 4 0 018 0 4 4 0 018 0c0 4-6 8.5-6 8.5z" stroke="#E11D48" stroke-width="1.5" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <span class="vc-count">5 sets</span>
+                </div>
+                <div class="vc-title">Learn by heart</div>
+                <div class="vc-desc">Curated word sets by theme — nature, family, food, greetings, numbers.</div>
+                <button class="vc-btn">Browse →</button>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- SKILLS -->
+    <div class="prac-section">
+        <div class="sec-label">Skills</div>
+        <div class="skills-row">
+
+            <div class="skill-card sk-writing" onclick="openModal('writingModal')">
+                <div class="sk-head">
+                    <div class="sk-icon-box">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M4 15.5l2.5-.5 9-9a1.77 1.77 0 00-2.5-2.5l-9 9-.5 2.5z" stroke="#B45309" stroke-width="1.6" stroke-linejoin="round"/>
+                            <path d="M3.5 17h4" stroke="#B45309" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <span class="sk-badge">In progress</span>
+                </div>
+                <div class="sk-title">Writing</div>
+                <div class="sk-desc">Translate short English sentences into Kyrgyz from memory.</div>
+                <div class="sk-bar"><div class="sk-bar-fill" style="width:38%"></div></div>
+                <div class="sk-foot">
+                    <span class="sk-prog">38% complete</span>
+                    <button class="sk-btn">Practice →</button>
+                </div>
+            </div>
+
+            <div class="skill-card sk-grammar" onclick="openModal('grammarModal')">
+                <div class="sk-head">
+                    <div class="sk-icon-box">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <rect x="3" y="3" width="14" height="14" rx="3" stroke="#0F766E" stroke-width="1.6"/>
+                            <path d="M7 8h6M7 11.5h4" stroke="#0F766E" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <span class="sk-badge">New unit</span>
+                </div>
+                <div class="sk-title">Grammar</div>
+                <div class="sk-desc">Case endings, verb conjugation and sentence structure — step by step.</div>
+                <div class="sk-bar"><div class="sk-bar-fill" style="width:22%"></div></div>
+                <div class="sk-foot">
+                    <span class="sk-prog">22% complete</span>
+                    <button class="sk-btn">Study →</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- TOPIC QUIZZES -->
+    <div class="prac-section">
+        <div class="sec-label">Topic quizzes</div>
+        <div class="topics-row">
+
+            <div class="topic-card tc-family" onclick="openQuiz('family')">
+                <div class="tc-icon-box">
+                    <svg width="17" height="17" viewBox="0 0 17 17" fill="none">
+                        <circle cx="8.5" cy="4.5" r="2.5" stroke="#E11D48" stroke-width="1.4"/>
+                        <path d="M3.5 14.5c0-2.8 2.2-5 5-5s5 2.2 5 5" stroke="#E11D48" stroke-width="1.4" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="tc-title">Family</div>
+                <div class="tc-meta">18 words · 12 phrases</div>
+                <div class="tc-bar"><div class="tc-bar-fill" style="width:72%"></div></div>
+                <div class="tc-score">72% mastered</div>
+            </div>
+
+            <div class="topic-card tc-shopping" onclick="openQuiz('shopping')">
+                <div class="tc-icon-box">
+                    <svg width="17" height="17" viewBox="0 0 17 17" fill="none">
+                        <path d="M2.5 3.5h2l2 7h6l1.5-5H6" stroke="#0284C7" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="7.5" cy="13.5" r="1" fill="#0284C7"/>
+                        <circle cx="12" cy="13.5" r="1" fill="#0284C7"/>
+                    </svg>
+                </div>
+                <div class="tc-title">Shopping</div>
+                <div class="tc-meta">14 words · 8 phrases</div>
+                <div class="tc-bar"><div class="tc-bar-fill" style="width:40%"></div></div>
+                <div class="tc-score">40% mastered</div>
+            </div>
+
+            <div class="topic-card tc-weather" onclick="openQuiz('weather')">
+                <div class="tc-icon-box">
+                    <svg width="17" height="17" viewBox="0 0 17 17" fill="none">
+                        <circle cx="8.5" cy="7.5" r="2.5" stroke="#B45309" stroke-width="1.4"/>
+                        <path d="M8.5 2v1M8.5 12v1M2.5 7.5h1M13.5 7.5h1M4.3 4.3l.7.7M12.7 12.7l-.7-.7M4.3 10.7l.7-.7M12.7 4.3l-.7.7" stroke="#B45309" stroke-width="1.2" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="tc-title">Weather</div>
+                <div class="tc-meta">10 words · 6 phrases</div>
+                <div class="tc-bar"><div class="tc-bar-fill" style="width:20%"></div></div>
+                <div class="tc-score">20% mastered</div>
+            </div>
+
+            <div class="topic-card tc-dir" onclick="openQuiz('directions')">
+                <div class="tc-icon-box">
+                    <svg width="17" height="17" viewBox="0 0 17 17" fill="none">
+                        <path d="M8.5 2.5v12M2.5 8.5h12" stroke="#0F766E" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M6 6l2.5-3 2.5 3" stroke="#0F766E" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="tc-title">Directions</div>
+                <div class="tc-meta">12 words · 9 phrases</div>
+                <div class="tc-bar"><div class="tc-bar-fill" style="width:0%"></div></div>
+                <div class="tc-score">Not started</div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- DIALECT TRANSLATOR -->
+    <div class="prac-section">
+        <div class="sec-label">Dialect translator</div>
+        <div class="tr-card">
+            <div class="tr-head">
+                <div class="tr-icon">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M2 4h6M4.5 4V2M2 8h4a3 3 0 003-3" stroke="#6366F1" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M8.5 13l1.5-4 1.5 4M9.4 12h1.2" stroke="#6366F1" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="tr-htitle">Kyrgyz dialect translator</div>
+                    <div class="tr-hsub">Enter a dialect word — get the standard Kyrgyz equivalent</div>
+                </div>
+            </div>
+            <div class="dtabs">
+                <button class="dtab active" data-d="south" onclick="selectDialect('south',this)">Түштүк</button>
+                <button class="dtab" data-d="talas"  onclick="selectDialect('talas',this)">Талас</button>
+                <button class="dtab" data-d="issyk"  onclick="selectDialect('issyk',this)">Ысык-Көл</button>
+                <button class="dtab" data-d="naryn"  onclick="selectDialect('naryn',this)">Нарын</button>
+                <button class="dtab" data-d="chui"   onclick="selectDialect('chui',this)">Чүй</button>
+            </div>
+            <div class="tr-body">
+                <div class="tr-panels">
+                    <div class="tr-col">
+                        <div class="tr-clbl">Dialect word <span class="tr-dpill pill-s" id="inputPill">Түштүк диалектиси</span></div>
+                        <textarea class="tr-textarea" id="translateInput" placeholder="e.g. катык, гилас, паша…" rows="3" oninput="onInputChange()"></textarea>
+                    </div>
+                    <div class="tr-arrow-mid">
+                        <div class="tr-arrow-box">
+                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M7 3l3 3-3 3" stroke="#94A3B8" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </div>
+                    </div>
+                    <div class="tr-col">
+                        <div class="tr-clbl">Standard Kyrgyz <span class="tr-dpill pill-std">Адабий тил</span></div>
+                        <div class="tr-out" id="translateOutput">Translation will appear here…</div>
+                    </div>
+                </div>
+                <div class="tr-meta" id="trMeta">
+                    <div class="trm-dot"></div>
+                    <span class="trm-text" id="trMetaText">—</span>
+                    <span class="trm-badge" id="trMetaBadge"></span>
+                </div>
+                <div class="tr-chips" id="wordChips"></div>
+                <div class="tr-foot">
+                    <span class="tr-hint" id="trHint">Tap a word chip above or type your own</span>
+                    <button class="tr-btn" onclick="doTranslate()">Translate →</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div><!-- /prac -->
+
+
+<!-- ══════════════════════════════════════════
+     FLASHCARDS MODAL
+══════════════════════════════════════════ -->
+<div class="modal-ov" id="flashcardsModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('flashcardsModal')">✕</button>
+    <div class="modal-inner">
+        <div class="modal-tag">Vocabulary</div>
+        <div class="modal-title">Flashcards</div>
+        <div class="modal-sub">Tap the card to reveal the answer, then mark how well you knew it.</div>
+
+        <div class="fc-progress-row">
+            <div class="fc-prog-bar"><div class="fc-prog-fill" id="fcProgFill" style="width:0%"></div></div>
+            <span class="fc-counter" id="fcCounter">1 / 10</span>
+        </div>
+
+        <div class="fc-scene" onclick="flipCard()">
+          <div class="flashcard" id="flashcard">
+
+            <!-- ── FRONT FACE ── -->
+            <div class="fc-face fc-front">
+                <div class="fc-front-photo" id="fcFrontPhoto">
+                    <img id="fcImg" src="" alt="" style="display:none; width:100%; height:100%; object-fit:cover;"/>
+                    <div class="fc-front-photo-ph" id="fcPhotoPlaceholder">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                            <rect x="2" y="2" width="28" height="28" rx="5" stroke="rgba(255,255,255,.15)" stroke-width="1.8"/>
+                            <circle cx="10" cy="11" r="2.5" fill="rgba(255,255,255,.12)"/>
+                            <path d="M2 22l8-7 6 5 5-4 9 8" stroke="rgba(255,255,255,.12)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="fc-front-body">
+                    <div class="fc-kyrgyz" id="fcKyrgyz">—</div>
+                    <div class="fc-tap-hint">Tap to reveal translation →</div>
+                </div>
+            </div>
+
+            <!-- ── BACK FACE ── -->
+            <div class="fc-face fc-back">
+                <div class="fc-back-photo" id="fcBackPhoto">
+                    <img id="fcImgBack" src="" alt="" style="display:none; width:100%; height:100%; object-fit:cover;"/>
+                    <div class="fc-back-photo-ph" id="fcBackPhotoPlaceholder">
+                        <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                            <rect x="2" y="2" width="28" height="28" rx="5" stroke="#C4C9D4" stroke-width="1.8"/>
+                            <circle cx="10" cy="11" r="2.5" fill="#E2E8F0"/>
+                            <path d="M2 22l8-7 6 5 5-4 9 8" stroke="#E2E8F0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="fc-back-body">
+                    <div class="fc-english" id="fcEnglish">—</div>
+                    <div class="fc-pronunciation" id="fcPron">—</div>
+                    <div class="fc-example">
+                        <div class="fc-ex-ky" id="fcExKy">—</div>
+                        <div class="fc-ex-en" id="fcExEn">—</div>
+                    </div>
+                </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="fc-actions" id="fcActions" style="display:none">
+            <button class="fc-act-btn wrong" onclick="rateCard('wrong')">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                Didn't know
+            </button>
+            <button class="fc-act-btn skip" onclick="rateCard('skip')">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 3l4 4-4 4M3 7h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Skip
+            </button>
+            <button class="fc-act-btn right" onclick="rateCard('right')">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l4 4 6-7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Got it
+            </button>
+        </div>
+
+        <div id="fcDone" style="display:none;text-align:center;padding:1rem 0">
+            <div style="font-size:1.4rem;font-weight:700;color:#6366F1;margin-bottom:.3rem" id="fcDoneScore"></div>
+            <div style="font-size:.78rem;color:#94A3B8;margin-bottom:1rem">session complete</div>
+            <button class="btn-replay" onclick="initFlashcards()">Restart deck →</button>
+        </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     LEARN BY HEART MODAL
+══════════════════════════════════════════ -->
+<div class="modal-ov" id="learnModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('learnModal')">✕</button>
+    <div class="modal-inner">
+        <div class="modal-tag">Vocabulary</div>
+        <div class="modal-title">Learn by heart</div>
+        <div class="modal-sub">Pick a theme set, study each word, then test yourself.</div>
+        <div class="lbh-sets" id="lbhSets"></div>
+        <div class="lbh-word-list" id="lbhWordList"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     WRITING MODAL
+══════════════════════════════════════════ -->
+<div class="modal-ov" id="writingModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('writingModal')">✕</button>
+    <div class="modal-inner">
+        <div class="modal-tag">Skills</div>
+        <div class="modal-title">Writing drill</div>
+        <div class="modal-sub">Translate each English sentence into Kyrgyz. Tap "Check" to see the answer.</div>
+        <div class="writing-prompt">
+            <div class="wp-num" id="wpNum">Sentence 1 of 8</div>
+            <div class="wp-text" id="wpText">—</div>
+        </div>
+        <textarea class="wp-answer" id="wpAnswer" rows="2" placeholder="Type in Kyrgyz…"></textarea>
+        <button class="wp-check-btn" onclick="checkWriting()">Check answer</button>
+        <div class="wp-result" id="wpResult">
+            <div class="wp-result-text" id="wpResultText"></div>
+            <div style="font-size:.76rem;margin-top:.3rem;opacity:.7" id="wpCorrectAns"></div>
+        </div>
+        <div class="wp-nav">
+            <span class="wp-indicator" id="wpScore">Score: 0 / 0</span>
+            <button class="wp-next-btn" id="wpNextBtn" onclick="nextWriting()">Next →</button>
+        </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     GRAMMAR MODAL
+══════════════════════════════════════════ -->
+<div class="modal-ov" id="grammarModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('grammarModal')">✕</button>
+    <div class="modal-inner">
+        <div class="modal-tag">Skills</div>
+        <div class="modal-title">Grammar</div>
+        <div class="modal-sub">Study rules, see examples, then answer the mini-quiz at the end.</div>
+        <div class="grammar-tabs" id="grammarTabs"></div>
+        <div id="grammarLessons"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     QUIZ MODAL
+══════════════════════════════════════════ -->
+<div class="modal-ov" id="quizModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('quizModal')">✕</button>
+    <div class="modal-inner">
+        <div class="modal-tag" id="quizTag">Quiz</div>
+        <div class="modal-title" id="quizTitle">—</div>
+        <div class="modal-sub" id="quizSub">Choose the correct Kyrgyz translation.</div>
+
+        <div id="quizGame">
+            <div class="quiz-hud">
+                <div class="quiz-score-chip">
+                    <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M5.5 1l1 2.2 2.4.35-1.75 1.7.42 2.4L5.5 6.6 3.43 7.65l.42-2.4L2.1 3.55l2.4-.35z" fill="#F59E0B"/></svg>
+                    <span id="quizScore">0</span> pts
+                </div>
+                <div class="quiz-prog"><div class="quiz-prog-fill" id="quizProgFill" style="width:0%"></div></div>
+                <span style="font-size:.72rem;color:#94A3B8;white-space:nowrap" id="quizQNum">1 / 10</span>
+            </div>
+            <div class="quiz-q-display">
+                <img id="quizQImg" class="quiz-q-img" src="" alt=""/>
+                <div class="quiz-q-text" id="quizQText">—</div>
+                <div class="quiz-q-sub" id="quizQSub">Translate to English</div>
+            </div>
+            <div class="quiz-opts" id="quizOpts"></div>
+        </div>
+
+        <div id="quizDone" style="display:none">
+            <div class="quiz-done">
+                <div class="quiz-done-score" id="quizDoneScore">0 pts</div>
+                <div class="quiz-done-sub" id="quizDoneSub">Quiz complete!</div>
+                <button class="btn-replay" onclick="restartQuiz()">Play again →</button>
+            </div>
+        </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+/* ════════════════════════════════════════════════
+   DATA
+════════════════════════════════════════════════ */
+
+/* ── FLASHCARD DATA ───────────────────────────── */
+const FLASHCARDS = [
+    { ky:'Салам',       en:'Hello',       pron:'sa-LAM',        img:'https://images.unsplash.com/photo-1516534775068-ba3e7458af70?w=500&q=75', exKy:'Салам, кандайсың?', exEn:'Hello, how are you?' },
+    { ky:'Суу',         en:'Water',       pron:'suu',           img:'https://images.unsplash.com/photo-1559825481-12a05cc00344?w=500&q=75', exKy:'Суу ичким келди.', exEn:'I want to drink water.' },
+    { ky:'Тоо',         en:'Mountain',    pron:'too',           img:'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=500&q=75', exKy:'Тоолор бийик.', exEn:'The mountains are high.' },
+    { ky:'Үй',          en:'House / Home',pron:'üy',            img:'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=500&q=75', exKy:'Үйгө кайтам.', exEn:'I am going home.' },
+    { ky:'Дос',         en:'Friend',      pron:'dos',           img:'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=500&q=75', exKy:'Ал менин досум.', exEn:'He is my friend.' },
+    { ky:'Тамак',       en:'Food',        pron:'ta-MAK',        img:'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&q=75', exKy:'Тамак жакшы жыттанат.', exEn:'The food smells good.' },
+    { ky:'Ата',         en:'Father',      pron:'a-TA',          img:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&q=75', exKy:'Атам иштейт.', exEn:'My father is working.' },
+    { ky:'Апа',         en:'Mother',      pron:'a-PA',          img:'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=500&q=75', exKy:'Апам тамак бышырат.', exEn:'My mother is cooking.' },
+    { ky:'Рахмат',      en:'Thank you',   pron:'rah-MAT',       img:null, exKy:'Жардамың үчүн рахмат.', exEn:'Thank you for your help.' },
+    { ky:'Кыргызстан',  en:'Kyrgyzstan',  pron:'kyr-gyz-STAN',  img:'https://images.unsplash.com/photo-1572883454114-1cf0031ede2a?w=500&q=75', exKy:'Кыргызстан — сонун өлкө.', exEn:'Kyrgyzstan is a beautiful country.' },
+];
+
+/* ── LEARN BY HEART SETS ──────────────────────── */
+const LBH_SETS = [
+    { name:'Greetings', meta:'8 words', words:[
+        {ky:'Салам',        en:'Hello',          pron:'sa-LAM'},
+        {ky:'Кандайсың?',   en:'How are you?',   pron:'kan-day-SYNG'},
+        {ky:'Жакшымын',     en:'I am fine',      pron:'zhak-shy-MYN'},
+        {ky:'Рахмат',       en:'Thank you',      pron:'rah-MAT'},
+        {ky:'Кечирип коюңуз',en:'Sorry / Excuse me',pron:'ke-chi-rip ko-YUŊ-uz'},
+        {ky:'Жакшы',        en:'Good / Well',    pron:'ZHAK-shy'},
+        {ky:'Кош болуңуз',  en:'Goodbye',        pron:'kosh bo-LUŊ-uz'},
+        {ky:'Ооба',         en:'Yes',            pron:'oo-BA'},
+    ]},
+    { name:'Family', meta:'8 words', words:[
+        {ky:'Апа',          en:'Mother',         pron:'a-PA'},
+        {ky:'Ата',          en:'Father',         pron:'a-TA'},
+        {ky:'Эне',          en:'Grandmother',    pron:'e-NE'},
+        {ky:'Чоң ата',      en:'Grandfather',    pron:'chong a-TA'},
+        {ky:'Бала',         en:'Child / Boy',    pron:'ba-LA'},
+        {ky:'Кыз',          en:'Girl / Daughter',pron:'kyz'},
+        {ky:'Бир тууган',   en:'Sibling',        pron:'bir tuu-GAN'},
+        {ky:'Үй-бүлө',      en:'Family',         pron:'üy-bü-LÖ'},
+    ]},
+    { name:'Nature', meta:'8 words', words:[
+        {ky:'Тоо',          en:'Mountain',       pron:'too'},
+        {ky:'Суу',          en:'Water',          pron:'suu'},
+        {ky:'Көл',          en:'Lake',           pron:'köl'},
+        {ky:'Токой',        en:'Forest',         pron:'to-KOY'},
+        {ky:'Асман',        en:'Sky',            pron:'as-MAN'},
+        {ky:'Күн',          en:'Sun / Day',      pron:'kün'},
+        {ky:'Жер',          en:'Earth / Land',   pron:'zher'},
+        {ky:'Жел',          en:'Wind',           pron:'zhel'},
+    ]},
+    { name:'Food', meta:'7 words', words:[
+        {ky:'Нан',          en:'Bread',          pron:'nan'},
+        {ky:'Эт',           en:'Meat',           pron:'et'},
+        {ky:'Сүт',          en:'Milk',           pron:'süt'},
+        {ky:'Мөмө',         en:'Fruit',          pron:'mö-MÖ'},
+        {ky:'Чай',          en:'Tea',            pron:'chay'},
+        {ky:'Тамак',        en:'Food / Meal',    pron:'ta-MAK'},
+        {ky:'Айран',        en:'Fermented milk', pron:'ay-RAN'},
+    ]},
+    { name:'Numbers 1–8', meta:'8 words', words:[
+        {ky:'Бир',          en:'One',            pron:'bir'},
+        {ky:'Эки',          en:'Two',            pron:'e-KI'},
+        {ky:'Үч',           en:'Three',          pron:'üch'},
+        {ky:'Төрт',         en:'Four',           pron:'tört'},
+        {ky:'Беш',          en:'Five',           pron:'besh'},
+        {ky:'Алты',         en:'Six',            pron:'al-TY'},
+        {ky:'Жети',         en:'Seven',          pron:'zhe-TI'},
+        {ky:'Сегиз',        en:'Eight',          pron:'se-GIZ'},
+    ]},
+];
+
+/* ── WRITING PROMPTS ──────────────────────────── */
+const WRITING_PROMPTS = [
+    { en:'Hello, how are you?',        answer:'Салам, кандайсың?',         hint:'Use "Салам" for hello and "кандайсың" for how are you' },
+    { en:'I am going home.',           answer:'Үйгө кайтам.',               hint:'"Үйгө" = to home, "кайтам" = I am going/returning' },
+    { en:'The mountains are high.',    answer:'Тоолор бийик.',              hint:'"Тоолор" = mountains (plural), "бийик" = high/tall' },
+    { en:'Thank you for your help.',   answer:'Жардамың үчүн рахмат.',      hint:'"Жардам" = help, "үчүн" = for, "рахмат" = thank you' },
+    { en:'My mother is cooking.',      answer:'Апам тамак бышырат.',        hint:'"Апам" = my mother, "тамак бышырат" = cooks food' },
+    { en:'He is my friend.',           answer:'Ал менин досум.',            hint:'"Ал" = he/she, "менин" = my, "досум" = my friend' },
+    { en:'The food smells good.',      answer:'Тамак жакшы жыттанат.',      hint:'"Тамак" = food, "жакшы" = good, "жыттанат" = smells' },
+    { en:'I want to drink water.',     answer:'Суу ичким келди.',           hint:'"Суу" = water, "ичким келди" = I want to drink' },
+];
+
+/* ── GRAMMAR LESSONS ──────────────────────────── */
+const GRAMMAR_LESSONS = [
+    {
+        tab: 'Greetings',
+        rule: 'Basic greetings in Kyrgyz',
+        text: 'Kyrgyz greetings depend on the number of people and formality. "Салам" is informal (one or few people). "Саламатсызбы" is formal/plural. When asking how someone is, "Кандайсың?" is informal (to a peer), while "Кандайсыз?" is polite.',
+        examples: [
+            { ky:'Салам!',              en:'Hello! (informal)' },
+            { ky:'Саламатсызбы?',       en:'Hello, how are you? (formal)' },
+            { ky:'Кандайсың?',          en:'How are you? (informal)' },
+            { ky:'Жакшымын, рахмат.',   en:'I am fine, thank you.' },
+        ],
+        quiz: { q:'Which word means "How are you?" (informal)?', opts:['Рахмат','Кандайсың?','Жакшы','Салам'], ans:'Кандайсың?' }
+    },
+    {
+        tab: 'Plural',
+        rule: 'Forming plurals with -лар / -лер / -дар / -дер',
+        text: 'Kyrgyz uses vowel harmony for plurals. After front vowels (е, ё, ü, i) use "-лер". After back vowels (а, о, у) use "-лар". After voiced consonants use "-дар/-дер". After voiceless consonants use "-тар/-тер".',
+        examples: [
+            { ky:'тоо → тоолор',    en:'mountain → mountains' },
+            { ky:'дос → достор',    en:'friend → friends' },
+            { ky:'апа → апалар',    en:'mother → mothers' },
+            { ky:'бала → балалар',  en:'child → children' },
+        ],
+        quiz: { q:'What is the plural of "дос" (friend)?', opts:['досдар','достор','дослар','досар'], ans:'достор' }
+    },
+    {
+        tab: 'Dative',
+        rule: 'Dative case: direction and purpose (-га / -ге / -а / -е)',
+        text: 'The dative case in Kyrgyz marks movement toward something (to, toward) or purpose (for). The suffix changes based on vowel harmony and the last consonant of the word. "-га/-ге" after most words, "-а/-е" after vowels.',
+        examples: [
+            { ky:'үй → үйгө',       en:'home → to/at home' },
+            { ky:'базар → базарга', en:'market → to the market' },
+            { ky:'мектеп → мектепке',en:'school → to school' },
+            { ky:'дос → доско',     en:'friend → to a friend' },
+        ],
+        quiz: { q:'How do you say "to school" in Kyrgyz?', opts:['мектепте','мектептен','мектепке','мектепти'], ans:'мектепке' }
+    },
+    {
+        tab: 'Pronouns',
+        rule: 'Personal pronouns',
+        text: 'Kyrgyz personal pronouns are straightforward. Unlike English, Kyrgyz does not distinguish gender in the third person — "ал" means both "he" and "she". The possessive is formed by adding a suffix to the noun.',
+        examples: [
+            { ky:'Мен — I',         en:'1st person singular' },
+            { ky:'Сен — You',       en:'2nd person singular (informal)' },
+            { ky:'Ал — He / She',   en:'3rd person singular (no gender)' },
+            { ky:'Биз — We',        en:'1st person plural' },
+        ],
+        quiz: { q:'What does "Ал" mean?', opts:['I','You','He / She','We'], ans:'He / She' }
+    },
+];
+
+/* ── TOPIC QUIZ DATA ──────────────────────────── */
+const QUIZ_DATA = {
+    family: {
+        title:'Family', color:'#E11D48',
+        questions:[
+            { q:'Апа',      sub:'Translate to English',  opts:['Mother','Father','Sister','Grandmother'], ans:'Mother' },
+            { q:'Ата',      sub:'Translate to English',  opts:['Uncle','Brother','Father','Son'],         ans:'Father' },
+            { q:'Бала',     sub:'Translate to English',  opts:['Girl','Child / Boy','Baby','Woman'],      ans:'Child / Boy' },
+            { q:'Кыз',      sub:'Translate to English',  opts:['Boy','Aunt','Girl / Daughter','Wife'],    ans:'Girl / Daughter' },
+            { q:'Эне',      sub:'Translate to English',  opts:['Sister','Grandmother','Mother','Aunt'],   ans:'Grandmother' },
+            { q:'Чоң ата',  sub:'Translate to English',  opts:['Old man','Grandfather','Father-in-law','Uncle'], ans:'Grandfather' },
+            { q:'Үй-бүлө',  sub:'Translate to English',  opts:['Home','Marriage','Family','Relatives'],   ans:'Family' },
+            { q:'My father', sub:'Translate to Kyrgyz',  opts:['Менин апам','Атам','Менин балам','Эне'],  ans:'Атам' },
+        ]
+    },
+    shopping: {
+        title:'Shopping', color:'#0284C7',
+        questions:[
+            { q:'Нан',      sub:'Translate to English',  opts:['Meat','Bread','Milk','Rice'],             ans:'Bread' },
+            { q:'Баа',      sub:'Translate to English',  opts:['Product','Price','Change','Market'],      ans:'Price' },
+            { q:'Базар',    sub:'Translate to English',  opts:['Street','Market','Shop','Bank'],          ans:'Market' },
+            { q:'Сатуучу',  sub:'Translate to English',  opts:['Buyer','Market','Seller / Vendor','Cashier'], ans:'Seller / Vendor' },
+            { q:'Канча турат?', sub:'Translate to English', opts:['Where is it?','How old?','How much does it cost?','Is it open?'], ans:'How much does it cost?' },
+            { q:'Кымбат',   sub:'Translate to English',  opts:['Cheap','Expensive','Big','Good'],         ans:'Expensive' },
+            { q:'Арзан',    sub:'Translate to English',  opts:['Small','Old','Cheap','Free'],             ans:'Cheap' },
+            { q:'Bread',    sub:'Translate to Kyrgyz',   opts:['Эт','Суу','Нан','Сүт'],                  ans:'Нан' },
+        ]
+    },
+    weather: {
+        title:'Weather', color:'#B45309',
+        questions:[
+            { q:'Жаңбыр',   sub:'Translate to English',  opts:['Snow','Rain','Wind','Cloud'],             ans:'Rain' },
+            { q:'Кар',      sub:'Translate to English',  opts:['Hail','Fog','Snow','Ice'],                ans:'Snow' },
+            { q:'Жел',      sub:'Translate to English',  opts:['Storm','Wind','Thunder','Rain'],          ans:'Wind' },
+            { q:'Ысык',     sub:'Translate to English',  opts:['Wet','Cold','Cloudy','Hot'],              ans:'Hot' },
+            { q:'Суук',     sub:'Translate to English',  opts:['Warm','Cold','Stormy','Windy'],           ans:'Cold' },
+            { q:'Бүгүн ысык', sub:'Translate to English', opts:['It is cold today','It is hot today','It is raining','It is snowing'], ans:'It is hot today' },
+            { q:'Rain',     sub:'Translate to Kyrgyz',   opts:['Кар','Жаңбыр','Жел','Ысык'],             ans:'Жаңбыр' },
+        ]
+    },
+    directions: {
+        title:'Directions', color:'#0F766E',
+        questions:[
+            { q:'Оң жак',   sub:'Translate to English',  opts:['Left side','Right side','Straight','Behind'], ans:'Right side' },
+            { q:'Сол жак',  sub:'Translate to English',  opts:['Right','Left side','Forward','Near'],     ans:'Left side' },
+            { q:'Түз',      sub:'Translate to English',  opts:['Turn','Back','Straight ahead','Far'],     ans:'Straight ahead' },
+            { q:'Кайда?',   sub:'Translate to English',  opts:['When?','Why?','Where?','How far?'],       ans:'Where?' },
+            { q:'Жакын',    sub:'Translate to English',  opts:['Far','Fast','Near / Close','Small'],      ans:'Near / Close' },
+            { q:'Алыс',     sub:'Translate to English',  opts:['Near','Right','Far','Slow'],              ans:'Far' },
+            { q:'Where is the market?', sub:'Translate to Kyrgyz', opts:['Базар алыстыбы?','Базар кайда?','Базарга бар','Базар жакын'], ans:'Базар кайда?' },
+        ]
+    }
+};
+
+/* ════════════════════════════════════════════════
+   MODAL HELPERS
+════════════════════════════════════════════════ */
+function openModal(id) {
+    document.getElementById(id).classList.add('open');
+    document.body.style.overflow = 'hidden';
+    if (id === 'flashcardsModal') initFlashcards();
+    if (id === 'learnModal')      initLearnByHeart();
+    if (id === 'writingModal')    initWriting();
+    if (id === 'grammarModal')    initGrammar();
+}
+function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+    document.body.style.overflow = '';
+}
+document.querySelectorAll('.modal-ov').forEach(m => m.addEventListener('click', e => {
+    if (e.target === m) closeModal(m.id);
+}));
+
+/* ════════════════════════════════════════════════
+   FLASHCARDS
+════════════════════════════════════════════════ */
+let fcIdx = 0, fcRight = 0, fcTotal = FLASHCARDS.length;
+
+function initFlashcards() {
+    fcIdx = 0; fcRight = 0;
+    document.getElementById('fcDone').style.display = 'none';
+    document.getElementById('flashcard').style.display = '';
+    document.getElementById('fcActions').style.display = 'none';
+    document.getElementById('flashcard').classList.remove('flipped');
+    loadCard();
+}
+
+function loadCard() {
+    const c = FLASHCARDS[fcIdx];
+    // front
+    document.getElementById('fcKyrgyz').textContent = c.ky;
+    // back
+    document.getElementById('fcEnglish').textContent = c.en;
+    document.getElementById('fcPron').textContent = '/' + c.pron + '/';
+    document.getElementById('fcExKy').textContent = c.exKy;
+    document.getElementById('fcExEn').textContent = c.exEn;
+
+    // photo — populate on BOTH faces independently
+    const frontImg = document.getElementById('fcImg');
+    const frontPh  = document.getElementById('fcPhotoPlaceholder');
+    const backImg  = document.getElementById('fcImgBack');
+    const backPh   = document.getElementById('fcBackPhotoPlaceholder');
+
+    if (c.img) {
+        frontImg.src = c.img;  frontImg.style.display  = 'block'; frontPh.style.display = 'none';
+        backImg.src  = c.img;  backImg.style.display   = 'block'; backPh.style.display  = 'none';
+    } else {
+        frontImg.style.display = 'none'; frontPh.style.display = 'flex';
+        backImg.style.display  = 'none'; backPh.style.display  = 'flex';
+    }
+
+    document.getElementById('flashcard').classList.remove('flipped');
+    document.getElementById('fcActions').style.display = 'none';
+    const pct = Math.round((fcIdx / fcTotal) * 100);
+    document.getElementById('fcProgFill').style.width = pct + '%';
+    document.getElementById('fcCounter').textContent = (fcIdx + 1) + ' / ' + fcTotal;
+}
+
+function flipCard() {
+    const fc = document.getElementById('flashcard');
+    if (!fc.classList.contains('flipped')) {
+        fc.classList.add('flipped');
+        setTimeout(() => {
+            document.getElementById('fcActions').style.display = 'flex';
+        }, 280);
+    }
+}
+
+function rateCard(rating) {
+    if (rating === 'right') fcRight++;
+    fcIdx++;
+    if (fcIdx >= fcTotal) {
+        document.getElementById('flashcard').style.display = 'none';
+        document.getElementById('fcActions').style.display = 'none';
+        document.getElementById('fcDone').style.display = 'block';
+        document.getElementById('fcDoneScore').textContent = fcRight + ' / ' + fcTotal + ' correct';
+        return;
+    }
+    loadCard();
+}
+
+/* ════════════════════════════════════════════════
+   LEARN BY HEART
+════════════════════════════════════════════════ */
+let lbhActive = 0;
+
+function initLearnByHeart() {
+    const setsEl = document.getElementById('lbhSets');
+    setsEl.innerHTML = '';
+    LBH_SETS.forEach((s, i) => {
+        const d = document.createElement('div');
+        d.className = 'lbh-set' + (i === 0 ? ' active' : '');
+        d.innerHTML = `<div class="lbh-set-name">${s.name}</div><div class="lbh-set-meta">${s.meta}</div>`;
+        d.onclick = () => { lbhActive = i; loadLBHSet(); document.querySelectorAll('.lbh-set').forEach((x,j)=>x.classList.toggle('active',j===i)); };
+        setsEl.appendChild(d);
+    });
+    loadLBHSet();
+}
+
+function loadLBHSet() {
+    const s = LBH_SETS[lbhActive];
+    const list = document.getElementById('lbhWordList');
+    list.innerHTML = '';
+    s.words.forEach(w => {
+        const row = document.createElement('div');
+        row.className = 'lbh-word-row';
+        row.innerHTML = `<span class="lbh-ky">${w.ky}</span><span class="lbh-pron">/${w.pron}/</span><span class="lbh-en">${w.en}</span>`;
+        list.appendChild(row);
+    });
+}
+
+/* ════════════════════════════════════════════════
+   WRITING
+════════════════════════════════════════════════ */
+let wpIdx = 0, wpScore = 0, wpAnswered = 0;
+
+function initWriting() {
+    wpIdx = 0; wpScore = 0; wpAnswered = 0;
+    loadPrompt();
+}
+
+function loadPrompt() {
+    const p = WRITING_PROMPTS[wpIdx];
+    document.getElementById('wpNum').textContent = 'Sentence ' + (wpIdx + 1) + ' of ' + WRITING_PROMPTS.length;
+    document.getElementById('wpText').textContent = p.en;
+    document.getElementById('wpAnswer').value = '';
+    document.getElementById('wpResult').style.display = 'none';
+    document.getElementById('wpResult').className = 'wp-result';
+    document.getElementById('wpNextBtn').style.display = 'none';
+    document.getElementById('wpScore').textContent = 'Score: ' + wpScore + ' / ' + wpAnswered;
+}
+
+function checkWriting() {
+    const p = WRITING_PROMPTS[wpIdx];
+    const userAns = document.getElementById('wpAnswer').value.trim();
+    if (!userAns) return;
+    const correct = userAns.toLowerCase() === p.answer.toLowerCase();
+    wpAnswered++;
+    if (correct) wpScore++;
+    const res = document.getElementById('wpResult');
+    res.style.display = 'block';
+    res.className = 'wp-result ' + (correct ? 'correct' : 'wrong');
+    document.getElementById('wpResultText').textContent = correct ? '✓ Correct!' : '✗ Not quite.';
+    document.getElementById('wpCorrectAns').textContent = correct ? '' : 'Answer: ' + p.answer + ' · ' + p.hint;
+    document.getElementById('wpNextBtn').style.display = 'inline-flex';
+    document.getElementById('wpScore').textContent = 'Score: ' + wpScore + ' / ' + wpAnswered;
+}
+
+function nextWriting() {
+    wpIdx++;
+    if (wpIdx >= WRITING_PROMPTS.length) wpIdx = 0;
+    loadPrompt();
+}
+
+/* ════════════════════════════════════════════════
+   GRAMMAR
+════════════════════════════════════════════════ */
+function initGrammar() {
+    const tabs = document.getElementById('grammarTabs');
+    const lessons = document.getElementById('grammarLessons');
+    tabs.innerHTML = ''; lessons.innerHTML = '';
+    GRAMMAR_LESSONS.forEach((g, i) => {
+        const t = document.createElement('button');
+        t.className = 'gram-tab' + (i === 0 ? ' active' : '');
+        t.textContent = g.tab;
+        t.onclick = () => {
+            document.querySelectorAll('.gram-tab').forEach((x,j)=>x.classList.toggle('active',j===i));
+            document.querySelectorAll('.grammar-lesson').forEach((x,j)=>x.classList.toggle('active',j===i));
+        };
+        tabs.appendChild(t);
+
+        const lesson = document.createElement('div');
+        lesson.className = 'grammar-lesson' + (i === 0 ? ' active' : '');
+        const exHTML = g.examples.map(e => `<div class="gram-ex"><span class="gram-ex-ky">${e.ky}</span><span class="gram-ex-en">${e.en}</span></div>`).join('');
+        const optsHTML = g.quiz.opts.map(o => `<button class="gram-opt" onclick="checkGramOpt(this,'${o.replace(/'/g,"\\'")}','${g.quiz.ans.replace(/'/g,"\\'")}')"> ${o}</button>`).join('');
+        lesson.innerHTML = `
+            <div class="gram-rule">
+                <div class="gram-rule-title">${g.rule}</div>
+                <div class="gram-rule-text">${g.text}</div>
+                <div class="gram-examples">${exHTML}</div>
+            </div>
+            <div class="gram-quiz">
+                <div class="gram-q-text">${g.quiz.q}</div>
+                <div class="gram-opts">${optsHTML}</div>
+            </div>`;
+        lessons.appendChild(lesson);
+    });
+}
+
+function checkGramOpt(btn, selected, correct) {
+    const parent = btn.closest('.gram-opts');
+    parent.querySelectorAll('.gram-opt').forEach(b => b.onclick = null);
+    btn.classList.add(selected === correct ? 'correct' : 'wrong');
+    if (selected !== correct) {
+        parent.querySelectorAll('.gram-opt').forEach(b => { if (b.textContent.trim() === correct) b.classList.add('correct'); });
+    }
+}
+
+/* ════════════════════════════════════════════════
+   TOPIC QUIZZES
+════════════════════════════════════════════════ */
+let quizTopic = null, quizIdx = 0, quizScore = 0, quizQs = [];
+
+function openQuiz(topic) {
+    quizTopic = topic;
+    openModal('quizModal');
+    const d = QUIZ_DATA[topic];
+    document.getElementById('quizTag').textContent = 'Topic Quiz';
+    document.getElementById('quizTitle').textContent = d.title + ' Quiz';
+    restartQuiz();
+}
+
+function restartQuiz() {
+    const d = QUIZ_DATA[quizTopic];
+    quizQs = [...d.questions].sort(() => Math.random() - .5);
+    quizIdx = 0; quizScore = 0;
+    document.getElementById('quizGame').style.display = '';
+    document.getElementById('quizDone').style.display = 'none';
+    loadQuizQ();
+}
+
+function loadQuizQ() {
+    const q = quizQs[quizIdx];
+    document.getElementById('quizScore').textContent = quizScore;
+    document.getElementById('quizQNum').textContent = (quizIdx + 1) + ' / ' + quizQs.length;
+    document.getElementById('quizProgFill').style.width = Math.round((quizIdx / quizQs.length) * 100) + '%';
+    document.getElementById('quizQText').textContent = q.q;
+    document.getElementById('quizQSub').textContent = q.sub;
+    const img = document.getElementById('quizQImg');
+    if (q.img) { img.src = q.img; img.style.display = 'block'; } else { img.style.display = 'none'; }
+    const opts = document.getElementById('quizOpts');
+    opts.innerHTML = '';
+    [...q.opts].sort(() => Math.random() - .5).forEach(o => {
+        const b = document.createElement('button');
+        b.className = 'quiz-opt'; b.textContent = o;
+        b.onclick = () => checkQuizOpt(b, o, q.ans);
+        opts.appendChild(b);
+    });
+}
+
+function checkQuizOpt(btn, selected, correct) {
+    document.querySelectorAll('.quiz-opt').forEach(b => b.onclick = null);
+    btn.classList.add(selected === correct ? 'correct' : 'wrong');
+    if (selected === correct) quizScore += 10;
+    else document.querySelectorAll('.quiz-opt').forEach(b => { if (b.textContent === correct) b.classList.add('correct'); });
+    document.getElementById('quizScore').textContent = quizScore;
+    setTimeout(() => {
+        quizIdx++;
+        if (quizIdx >= quizQs.length) {
+            document.getElementById('quizGame').style.display = 'none';
+            document.getElementById('quizDone').style.display = 'block';
+            document.getElementById('quizDoneScore').textContent = quizScore + ' pts';
+            const msg = quizScore >= quizQs.length * 8 ? 'Excellent work!' : quizScore >= quizQs.length * 5 ? 'Good effort!' : 'Keep practising!';
+            document.getElementById('quizDoneSub').textContent = msg + ' (' + Math.round((quizScore / (quizQs.length * 10)) * 100) + '% correct)';
+            fetch('/api/add_points', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({points: quizScore}) }).catch(()=>{});
+        } else loadQuizQ();
+    }, 900);
+}
+
+/* ════════════════════════════════════════════════
+   DIALECT TRANSLATOR
+════════════════════════════════════════════════ */
+const DIALECTS = {
+    south: { label:'Түштүк диалектиси', pill:'pill-s', color:'#B45309', words:{
+        'катык':      {std:'айран',                 def:'fermented milk drink'},
+        'жувалдыз':   {std:'темене',                def:'large needle'},
+        'тукум':      {std:'жумуртка',              def:'egg'},
+        'паша':       {std:'чиркей',                def:'mosquito'},
+        'гилас':      {std:'алча',                  def:'cherry plum'},
+        'тамарка':    {std:'огород',                def:'vegetable garden'},
+        'айван':      {std:'бастырма, коридор',     def:'covered veranda or corridor'},
+        'пешайван':   {std:'кире бериш, коридор',   def:'entrance hall, corridor'},
+        'шырдан':     {std:'бийик кереге',           def:'tall yurt lattice wall'},
+        'бейва':      {std:'жесир',                 def:'widow'},
+        'нааматы':    {std:'музыкант',              def:'musician'},
+        'асип':       {std:'быжы',                  def:'stuffed intestine dish'},
+        'жапан':      {std:'ээн жер',               def:'deserted, empty place'},
+        'чыкыроон':   {std:'суук, ызгаар',          def:'bitter cold, icy chill'},
+        'бадан':      {std:'тулку бой',             def:'the whole body'},
+        'талаа тоок': {std:'кыргоол',               def:'pheasant'},
+        'төштүк':     {std:'боркок',                def:'brisket (chest cut of meat)'},
+        'жөө желим':  {std:'сөөлжан',               def:'earthworm'},
+    }},
+    talas: { label:'Талас говору', pill:'pill-t', color:'#0F766E', words:{
+        'тапанча':  {std:'көмөч казандын наны',               def:'bread baked in a clay pot'},
+        'текмат':   {std:'кайыш кур',                         def:'leather belt'},
+        'бостек':   {std:'көлдөлөң',                          def:'crosswise, transverse'},
+        'чермий':   {std:'чыптама',                           def:'waistcoat, vest'},
+        'тыбыт':    {std:'майдын чөбөгөсү',                   def:'foam from butter-making'},
+        'чайанчы':  {std:'балчы',                             def:'beekeeper'},
+        'мамадана': {std:'чоң кишидей сүйлөгөн жаш бала',    def:'child who speaks like an adult'},
+        'шалдама':  {std:'этти майдалап туурап пияз кошкон тамак', def:'minced meat dish with onion'},
+        'дагыра':   {std:'чылапчын',                          def:'basin, washbowl'},
+    }},
+    issyk: { label:'Ысык-Көл говору', pill:'pill-i', color:'#0284C7', words:{
+        'конок':   {std:'жүгөрү',   def:'maize, corn'},
+        'бадыбот': {std:'кесе',     def:'cup, bowl'},
+        'илеген':  {std:'чылапчын', def:'basin, washbowl (cf. Нарын: таштек)'},
+    }},
+    naryn: { label:'Нарын говору', pill:'pill-n', color:'#7C3AED', words:{
+        'чөмөлөк': {std:'туткалуу идиш', def:'vessel with a handle'},
+        'тогон':   {std:'платина',        def:'platinum'},
+        'тогоон':  {std:'платина',        def:'platinum (variant)'},
+        'доол':    {std:'мөндүр',         def:'hail'},
+        'бортоной':{std:'өпкө кап',       def:'lung sac'},
+        'таштек':  {std:'чылапчын',       def:'basin, washbowl (cf. Ысык-Көл: илеген)'},
+    }},
+    chui: { label:'Чүй говору', pill:'pill-c', color:'#DC2626', words:{
+        'чомпуш':  {std:'билими жок, түшүнүгү аз киши', def:'ignorant, dim-witted person'},
+        'ойбут':   {std:'эки жагы бийик, ортосу чуңкур жер', def:'hollow ground, sunken terrain between ridges'},
+        'доңго':   {std:'аттын бутуна калган балчык', def:'mud stuck on a horse\'s hoof'},
+        'чертмек': {std:'комуз',          def:'the komuz (Kyrgyz string instrument)'},
+    }},
+};
+let activeDialect = 'south';
+
+function selectDialect(id, btn) {
+    activeDialect = id;
+    document.querySelectorAll('.dtab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    const d = DIALECTS[id];
+    const pill = document.getElementById('inputPill');
+    pill.className = 'tr-dpill ' + d.pill;
+    pill.textContent = d.label;
+    document.getElementById('translateInput').value = '';
+    resetOutput(); buildChips(id);
+}
+
+function buildChips(id) {
+    const d = DIALECTS[id];
+    const bg = {'pill-s':'#FFFBEB','pill-t':'#CCFBF1','pill-i':'#E0F2FE','pill-n':'#F5F3FF','pill-c':'#FEF2F2'}[d.pill] || '#EEF2FF';
+    const container = document.getElementById('wordChips'); container.innerHTML = '';
+    Object.keys(d.words).forEach(word => {
+        const c = document.createElement('button'); c.className = 'tw-chip';
+        c.style.background = bg; c.style.color = d.color; c.style.borderColor = bg; c.textContent = word;
+        c.onclick = () => { document.getElementById('translateInput').value = word; doTranslate(); };
+        container.appendChild(c);
+    });
+}
+
+function doTranslate() {
+    const raw = document.getElementById('translateInput').value.trim().toLowerCase();
+    const out = document.getElementById('translateOutput');
+    const meta = document.getElementById('trMeta');
+    if (!raw) { resetOutput(); return; }
+    let result = null, foundIn = null;
+    if (DIALECTS[activeDialect].words[raw]) { result = DIALECTS[activeDialect].words[raw]; foundIn = activeDialect; }
+    if (!result) {
+        for (const [did, d] of Object.entries(DIALECTS)) {
+            for (const [w, e] of Object.entries(d.words)) {
+                if (w.startsWith(raw) || raw.startsWith(w) || w.includes(raw)) { result = e; foundIn = did; break; }
+            }
+            if (result) break;
+        }
+    }
+    if (result) {
+        out.classList.add('has-text');
+        out.innerHTML = `<strong style="color:#0F172A">${result.std}</strong><br><span style="font-size:.78rem;color:#94A3B8">${result.def}</span>`;
+        meta.classList.add('show');
+        document.getElementById('trMetaText').textContent = 'Found in: ' + DIALECTS[foundIn].label;
+        const b = document.getElementById('trMetaBadge');
+        b.className = 'trm-badge ' + DIALECTS[foundIn].pill; b.textContent = DIALECTS[foundIn].label;
+        document.getElementById('trHint').textContent = 'Matched from local dialect dictionary';
+    } else {
+        out.classList.remove('has-text'); out.textContent = 'Searching…'; meta.classList.remove('show');
+        fetch('/api/translate', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({text:raw, dialect:activeDialect}) })
+        .then(r => r.json()).then(data => { out.textContent = data.translation || 'Not found.'; out.classList.add('has-text'); })
+        .catch(() => { out.textContent = 'Not found in dictionary.'; });
+    }
+}
+
+function onInputChange() { if (!document.getElementById('translateInput').value.trim()) resetOutput(); }
+function resetOutput() {
+    const out = document.getElementById('translateOutput');
+    out.classList.remove('has-text'); out.textContent = 'Translation will appear here…';
+    document.getElementById('trMeta').classList.remove('show');
+}
+
+buildChips('south');
+</script>
+{% endblock %}

@@ -1,0 +1,228 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In — Tilbil</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            padding: 2rem 1rem;
+            position: relative; overflow: hidden;
+        }
+
+        /* ── PHOTO BACKGROUND ── */
+        .bg-photo {
+            position: fixed; inset: 0; z-index: 0;
+            background: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1800&q=85')
+                        center 40% / cover no-repeat;
+        }
+        .bg-overlay {
+            position: fixed; inset: 0; z-index: 1;
+            background: linear-gradient(
+                135deg,
+                rgba(10,10,15,.72) 0%,
+                rgba(10,10,15,.55) 50%,
+                rgba(10,10,15,.45) 100%
+            );
+        }
+
+        /* ── CARD ── */
+        .card {
+            position: relative; z-index: 2;
+            background: rgba(255,255,255,.97);
+            backdrop-filter: blur(20px);
+            border-radius: 18px;
+            border: 1px solid rgba(255,255,255,.6);
+            padding: 2.5rem 2.75rem;
+            width: 100%; max-width: 440px;
+            box-shadow: 0 24px 64px rgba(0,0,0,.22), 0 4px 16px rgba(0,0,0,.12);
+        }
+
+        /* brand */
+        .brand { text-align: center; margin-bottom: 1.75rem; }
+        .brand-logo {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 36px; height: 36px; background: #4F46E5; border-radius: 9px;
+            margin: 0 auto .65rem;
+        }
+        .brand-name {
+            font-size: 1.1rem; font-weight: 700; color: #111827;
+            letter-spacing: -.02em; margin-bottom: .2rem;
+        }
+        .brand-tag { font-size: .78rem; color: #9CA3AF; font-weight: 500; }
+
+        h1 {
+            font-size: 1.3rem; font-weight: 700; color: #111827;
+            letter-spacing: -.3px; margin-bottom: 1.4rem;
+        }
+
+        .flash-msg {
+            background: #FEF2F2; border: 1px solid #FECACA; color: #DC2626;
+            font-size: .78rem; font-weight: 500; padding: .65rem .85rem;
+            border-radius: 8px; margin-bottom: 1rem;
+        }
+        .flash-msg.success {
+            background: #F0FDF4; border-color: #BBF7D0; color: #15803D;
+        }
+
+        /* Google button */
+        .btn-google {
+            width: 100%; padding: .75rem 1rem;
+            background: white; color: #374151;
+            border: 1.5px solid #E5E7EB; border-radius: 10px;
+            font-family: 'Inter', sans-serif; font-size: .86rem; font-weight: 600;
+            cursor: pointer; transition: all .15s;
+            display: flex; align-items: center; justify-content: center; gap: .6rem;
+            text-decoration: none; margin-bottom: 1.1rem;
+        }
+        .btn-google:hover { background: #F9FAFB; border-color: #C4C9D4; }
+
+        /* divider */
+        .divider {
+            display: flex; align-items: center; gap: .65rem;
+            margin-bottom: 1.1rem;
+        }
+        .divider-line { flex: 1; height: 1px; background: #F1F3F6; }
+        .divider-text { font-size: .72rem; color: #C4C9D4; font-weight: 500; white-space: nowrap; }
+
+        /* fields */
+        .field { margin-bottom: .9rem; }
+        .field label {
+            display: block; font-size: .65rem; font-weight: 700;
+            color: #374151; margin-bottom: .32rem; letter-spacing: .07em;
+            text-transform: uppercase;
+        }
+        .input-wrap { position: relative; }
+        .input-wrap input {
+            width: 100%; padding: .72rem .95rem;
+            border: 1px solid #E5E7EB; border-radius: 9px;
+            font-family: 'Inter', sans-serif; font-size: .88rem;
+            color: #111827; background: white; outline: none;
+            transition: border-color .15s, box-shadow .15s;
+        }
+        .input-wrap input:focus {
+            border-color: #4F46E5;
+            box-shadow: 0 0 0 3px rgba(79,70,229,.08);
+        }
+        .input-wrap input::placeholder { color: #D1D5DB; }
+
+        .eye-btn {
+            position: absolute; right: .8rem; top: 50%; transform: translateY(-50%);
+            background: none; border: none; cursor: pointer; padding: 2px;
+            color: #D1D5DB; display: flex; align-items: center; transition: color .15s;
+        }
+        .eye-btn:hover { color: #6B7280; }
+
+        .btn-submit {
+            width: 100%; padding: .78rem; background: #111827; color: white;
+            border: none; border-radius: 9px; font-family: 'Inter', sans-serif;
+            font-size: .88rem; font-weight: 600; cursor: pointer;
+            transition: background .15s; margin-top: .4rem;
+        }
+        .btn-submit:hover { background: #4F46E5; }
+
+        .auth-switch {
+            text-align: center; margin-top: 1.15rem;
+            font-size: .8rem; color: #9CA3AF; font-weight: 500;
+        }
+        .auth-switch a { color: #4F46E5; font-weight: 700; text-decoration: none; }
+        .auth-switch a:hover { color: #3730A3; }
+
+        /* corner watermark */
+        .bg-credit {
+            position: fixed; bottom: 1rem; right: 1rem; z-index: 3;
+            font-size: .65rem; color: rgba(255,255,255,.3); font-weight: 400;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-photo"></div>
+    <div class="bg-overlay"></div>
+
+    <div class="card">
+
+        <div class="brand">
+            <div class="brand-logo">
+                <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+                    <path d="M3 17L10 3L17 17" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M6 12H14" stroke="white" stroke-width="2.4" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="brand-name">Tilbil</div>
+            <div class="brand-tag">Continue your Kyrgyz learning path</div>
+        </div>
+
+        <h1>Welcome back</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for cat, msg in messages %}
+                <div class="flash-msg {{ 'success' if cat == 'success' else '' }}">{{ msg }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        <!-- Google OAuth -->
+        <a href="{{ url_for('google_login') }}" class="btn-google">
+            <svg width="17" height="17" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+                <path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/>
+                <path d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.175 0 7.55 0 9s.348 2.825.957 4.039l3.007-2.332z" fill="#FBBC05"/>
+                <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z" fill="#EA4335"/>
+            </svg>
+            Continue with Google
+        </a>
+
+        <div class="divider">
+            <div class="divider-line"></div>
+            <span class="divider-text">or sign in with email</span>
+            <div class="divider-line"></div>
+        </div>
+
+        <form method="POST" action="{{ url_for('login') }}">
+            <div class="field">
+                <label>Email</label>
+                <div class="input-wrap">
+                    <input type="email" name="email" placeholder="yourname@gmail.com"
+                           required autocomplete="email">
+                </div>
+            </div>
+            <div class="field">
+                <label>Password</label>
+                <div class="input-wrap">
+                    <input type="password" name="password" id="loginPwd"
+                           placeholder="Enter your password"
+                           required autocomplete="current-password">
+                    <button type="button" class="eye-btn" onclick="togglePwd('loginPwd',this)" tabindex="-1">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Sign in →</button>
+        </form>
+
+        <p class="auth-switch">Don't have an account? <a href="{{ url_for('register') }}">Create one</a></p>
+    </div>
+
+    <div class="bg-credit">Ala-Too Mountains, Kyrgyzstan</div>
+
+    <script>
+    function togglePwd(id, btn) {
+        const inp = document.getElementById(id);
+        const hide = inp.type === 'password';
+        inp.type = hide ? 'text' : 'password';
+        btn.innerHTML = hide
+            ? `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`
+            : `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+        btn.style.color = hide ? '#6B7280' : '#D1D5DB';
+    }
+    </script>
+</body>
+</html>

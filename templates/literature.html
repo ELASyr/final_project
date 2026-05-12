@@ -1,0 +1,1398 @@
+{% extends "base.html" %}
+{% block title %}Literature{% endblock %}
+
+{% block extra_css %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; }
+
+.lit { max-width: 960px; font-family: 'Inter', sans-serif; }
+
+/* ── HERO ──────────────────────────────────────── */
+.lit-hero {
+    border-radius: 16px; overflow: hidden; min-height: 300px;
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; text-align: center; padding: 3rem 2rem;
+    margin-bottom: 2rem; position: relative;
+    background: url('https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=1400&q=80') center/cover no-repeat;
+}
+.lit-hero::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(10,10,30,.62) 0%, rgba(15,12,40,.85) 100%);
+}
+.lit-hero > * { position: relative; z-index: 1; }
+.lit-hero-tag {
+    display: inline-flex; align-items: center; gap: .45rem;
+    background: rgba(255,255,255,.12); backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,.2); color: rgba(255,255,255,.9);
+    font-size: .66rem; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; padding: .35rem .9rem; border-radius: 99px;
+    margin-bottom: .9rem;
+}
+.lit-hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 2.9rem); font-weight: 700;
+    color: white; letter-spacing: -.02em; margin-bottom: .6rem;
+    text-shadow: 0 2px 24px rgba(0,0,0,.35);
+}
+.lit-hero p {
+    color: rgba(255,255,255,.65); font-size: .9rem;
+    max-width: 440px; line-height: 1.6; margin-bottom: 1.75rem;
+}
+.hero-stats-row {
+    display: inline-flex; background: rgba(255,255,255,.1);
+    backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,.16);
+    border-radius: 12px; overflow: hidden;
+}
+.hstat {
+    text-align: center; padding: .7rem 1.6rem;
+    border-right: 1px solid rgba(255,255,255,.1);
+}
+.hstat:last-child { border-right: none; }
+.hstat-n { display: block; font-size: 1.3rem; font-weight: 700; color: white; line-height: 1; margin-bottom: .18rem; }
+.hstat-l { font-size: .66rem; color: rgba(255,255,255,.5); text-transform: uppercase; letter-spacing: .05em; }
+
+/* ── FILTER BAR ────────────────────────────────── */
+.filter-bar {
+    display: flex; align-items: center; gap: .45rem;
+    margin-bottom: 1.75rem; flex-wrap: wrap;
+}
+.filter-lbl {
+    font-size: .64rem; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: #94A3B8; margin-right: .25rem;
+}
+.fchip {
+    padding: .32rem .85rem; border-radius: 99px;
+    border: 1.5px solid #E5E7EB; font-size: .78rem;
+    font-weight: 500; color: #6B7280; background: white;
+    cursor: pointer; transition: all .15s;
+}
+.fchip:hover { border-color: #6366F1; color: #6366F1; }
+.fchip.active { background: #6366F1; color: white; border-color: #6366F1; }
+
+/* ── SECTION LABEL ─────────────────────────────── */
+.sec-label {
+    font-size: .64rem; font-weight: 700; letter-spacing: .13em;
+    text-transform: uppercase; color: #94A3B8; margin: 0 0 .85rem;
+}
+
+/* ── BOOKS GRID ────────────────────────────────── */
+.books-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1.1rem; margin-bottom: 2rem;
+}
+.book-card {
+    background: white; border-radius: 14px; border: 1px solid #EAECF2;
+    overflow: hidden; cursor: pointer;
+    transition: transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .22s ease;
+    position: relative;
+}
+.book-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 48px rgba(79,70,229,.12);
+    border-color: transparent;
+}
+.book-card:hover .bc-cta { opacity: 1; transform: translateY(0); }
+.book-card:hover .bc-cover-img { transform: scale(1.04); }
+
+.bc-cover {
+    height: 180px; position: relative; overflow: hidden;
+    display: flex; flex-direction: column; justify-content: flex-end; padding: 1rem;
+}
+.bc-cover::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 30%, rgba(0,0,0,.6) 100%);
+}
+.bc-cover-img {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: cover; transition: transform .4s ease;
+}
+.bc-cover-pattern {
+    position: absolute; inset: 0; opacity: .1;
+    background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.3) 0, rgba(255,255,255,.3) 1px, transparent 0, transparent 50%);
+    background-size: 12px 12px;
+}
+.bc-title-cover {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem; font-weight: 700; color: white;
+    line-height: 1.2; position: relative; z-index: 2;
+}
+.bc-author-cover {
+    font-size: .72rem; color: rgba(255,255,255,.7);
+    margin-top: .15rem; position: relative; z-index: 2;
+}
+
+.bc-body { padding: 1rem 1.1rem; }
+.bc-tags { display: flex; gap: .4rem; margin-bottom: .6rem; flex-wrap: wrap; }
+.bc-tag {
+    font-size: .62rem; font-weight: 700; letter-spacing: .05em;
+    text-transform: uppercase; padding: .2rem .55rem; border-radius: 99px;
+}
+.tag-beginner     { background: #DCFCE7; color: #16A34A; }
+.tag-intermediate { background: #FEF9C3; color: #B45309; }
+.tag-advanced     { background: #FFE4E6; color: #BE123C; }
+.tag-epic         { background: #F3E8FF; color: #7C3AED; }
+.tag-genre        { background: #EEF2FF; color: #4F46E5; }
+
+.bc-title {
+    font-family: 'Playfair Display', serif;
+    font-size: .95rem; font-weight: 700; color: #0F172A; margin-bottom: .15rem;
+}
+.bc-author { font-size: .74rem; color: #6366F1; font-weight: 500; margin-bottom: .5rem; }
+.bc-desc {
+    font-size: .76rem; color: #94A3B8; line-height: 1.55;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    margin-bottom: .85rem;
+}
+.bc-footer { display: flex; align-items: center; justify-content: space-between; }
+.bc-pages { font-size: .7rem; color: #C4C9D4; display: flex; align-items: center; gap: .3rem; }
+.bc-progress { display: flex; flex-direction: column; align-items: flex-end; gap: .2rem; }
+.bc-prog-lbl { font-size: .62rem; color: #C4C9D4; }
+.bc-prog-bar { width: 58px; height: 3px; background: #F1F3F6; border-radius: 99px; overflow: hidden; }
+.bc-prog-fill { height: 100%; background: #6366F1; border-radius: 99px; }
+
+.bc-cta {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: .65rem 1.1rem; background: #6366F1; color: white;
+    font-size: .76rem; font-weight: 600; text-align: center;
+    opacity: 0; transform: translateY(6px); transition: opacity .2s, transform .2s;
+}
+
+/* ── READER MODAL ──────────────────────────────── */
+.modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 700;
+    background: rgba(10,10,25,.6); backdrop-filter: blur(6px);
+    align-items: center; justify-content: center; padding: 1rem;
+}
+.modal-overlay.active { display: flex; }
+.modal-reader {
+    background: white; border-radius: 18px; width: 100%; max-width: 1080px;
+    max-height: 90vh; display: flex; flex-direction: column; overflow: hidden;
+    box-shadow: 0 32px 80px rgba(0,0,0,.22);
+    animation: slideUp .28s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes slideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+/* TOP BAR */
+.reader-topbar {
+    display: flex; align-items: center; gap: .85rem;
+    padding: .8rem 1.4rem; border-bottom: 1px solid #EAECF2;
+    flex-shrink: 0; background: white;
+}
+.rt-eyebrow {
+    font-size: .62rem; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: #6366F1; background: #EEF2FF;
+    padding: .2rem .6rem; border-radius: 4px; flex-shrink: 0;
+}
+.rt-title {
+    font-family: 'Playfair Display', serif;
+    font-size: .95rem; font-weight: 700; color: #0F172A;
+}
+.rt-sep { color: #E5E7EB; }
+.rt-author { font-size: .78rem; color: #94A3B8; }
+.rt-progress-wrap { flex: 1; display: flex; align-items: center; gap: .65rem; margin-left: .25rem; }
+.rt-prog-bar { flex: 1; max-width: 160px; height: 4px; background: #F1F3F6; border-radius: 99px; overflow: hidden; }
+.rt-prog-fill { height: 100%; background: linear-gradient(90deg,#6366F1,#818CF8); border-radius: 99px; transition: width .3s; }
+.rt-prog-lbl { font-size: .7rem; color: #94A3B8; white-space: nowrap; }
+.rt-actions { display: flex; align-items: center; gap: .4rem; margin-left: auto; }
+.rt-btn {
+    width: 30px; height: 30px; border-radius: 7px; border: 1px solid #E5E7EB;
+    background: white; cursor: pointer; display: flex; align-items: center;
+    justify-content: center; font-size: .78rem; color: #9CA3AF;
+    transition: all .15s; font-family: 'Inter', sans-serif; font-weight: 600;
+}
+.rt-btn:hover { background: #EEF2FF; color: #6366F1; border-color: #C7D2FE; }
+.rt-btn.active { background: #6366F1; color: white; border-color: #6366F1; }
+
+/* MODAL BODY */
+.reader-body { display: flex; flex: 1; overflow: hidden; }
+
+/* CHAPTER NAV */
+.chapter-nav {
+    width: 210px; border-right: 1px solid #EAECF2; background: #FAFBFF;
+    overflow-y: auto; flex-shrink: 0; padding: 1rem 0;
+}
+.cn-label {
+    font-size: .62rem; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; color: #C4C9D4; padding: 0 1rem; margin-bottom: .65rem;
+}
+.ch-item {
+    display: flex; align-items: center; gap: .6rem; padding: .55rem 1rem;
+    cursor: pointer; transition: background .12s; border-left: 2px solid transparent;
+}
+.ch-item:hover { background: white; }
+.ch-item.active { background: white; border-left-color: #6366F1; }
+.ch-num { font-size: .65rem; font-weight: 700; color: #C4C9D4; width: 18px; flex-shrink: 0; }
+.ch-item.active .ch-num { color: #6366F1; }
+.ch-name { font-size: .78rem; color: #6B7280; line-height: 1.3; }
+.ch-item.active .ch-name { color: #0F172A; font-weight: 600; }
+.ch-dot { width: 5px; height: 5px; border-radius: 50%; background: #6366F1; margin-left: auto; flex-shrink: 0; display: none; }
+.ch-item.active .ch-dot { display: block; }
+
+/* READER MAIN */
+.reader-main {
+    flex: 1; overflow-y: auto; padding: 2.25rem 2.75rem; scroll-behavior: smooth;
+}
+.reading-text { max-width: 620px; margin: 0 auto; }
+
+.word-legend {
+    display: flex; align-items: center; gap: .9rem; margin-bottom: 1.5rem;
+    padding: .65rem .9rem; background: #FAFBFF; border-radius: 9px;
+    border: 1px solid #EAECF2;
+}
+.leg-item { display: flex; align-items: center; gap: .3rem; font-size: .7rem; color: #94A3B8; }
+.leg-dot { width: 7px; height: 7px; border-radius: 50%; }
+.leg-hint { margin-left: auto; font-size: .68rem; color: #6366F1; cursor: default; }
+
+.reading-text p {
+    font-size: 1.05rem; line-height: 1.95; color: #374151;
+    margin-bottom: 1.4rem; font-weight: 400;
+}
+.reading-text p.lead { font-size: 1.12rem; color: #0F172A; }
+
+/* Clickable words */
+.w {
+    cursor: pointer; border-bottom: 1.5px dashed transparent;
+    border-radius: 3px; padding: 0 1px; transition: all .13s; position: relative;
+}
+.w:hover { border-bottom-color: #6366F1; background: #EEF2FF; color: #4F46E5; }
+.w.type-verb  { color: #DC2626; border-bottom: 1.5px solid rgba(220,38,38,.3); }
+.w.type-noun  { color: #2563EB; border-bottom: 1.5px solid rgba(37,99,235,.3); }
+.w.type-adj   { color: #7C3AED; border-bottom: 1.5px solid rgba(124,58,237,.3); }
+.w.type-verb:hover { background: #FEF2F2; }
+.w.type-noun:hover { background: #EFF6FF; }
+.w.type-adj:hover  { background: #F5F3FF; }
+
+/* Page footer */
+.reader-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 2rem; padding-top: 1.4rem; border-top: 1px solid #F1F3F6;
+}
+.page-indicator { font-size: .74rem; color: #C4C9D4; font-weight: 600; }
+.page-controls { display: flex; gap: .4rem; }
+.page-btn {
+    width: 34px; height: 34px; border: 1.5px solid #E5E7EB; border-radius: 9px;
+    background: white; cursor: pointer; font-size: 1rem; color: #6B7280;
+    display: flex; align-items: center; justify-content: center; transition: all .15s;
+}
+.page-btn:hover { background: #6366F1; color: white; border-color: #6366F1; }
+.page-btn:disabled { opacity: .3; cursor: not-allowed; }
+
+/* SIDEBAR */
+.reader-sidebar {
+    width: 290px; border-left: 1px solid #EAECF2;
+    overflow-y: auto; flex-shrink: 0; background: white;
+}
+.sb-panel { border-bottom: 1px solid #EAECF2; }
+.sb-panel-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: .85rem 1.1rem .7rem; cursor: pointer; user-select: none;
+}
+.sb-tag {
+    font-size: .62rem; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; color: #6366F1;
+}
+.sb-toggle { font-size: .65rem; color: #C4C9D4; transition: transform .2s; }
+.sb-body { padding: 0 1.1rem 1.1rem; }
+.sb-body.collapsed { display: none; }
+
+/* AUDIO */
+.audio-card {
+    background: #0F0E17; border-radius: 11px; padding: 1rem;
+}
+.audio-head { display: flex; align-items: center; gap: .65rem; margin-bottom: .9rem; }
+.audio-icon {
+    width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0;
+    background: linear-gradient(135deg, #6366F1, #818CF8);
+    display: flex; align-items: center; justify-content: center;
+}
+.audio-track { font-size: .78rem; font-weight: 600; color: white; margin-bottom: .12rem; }
+.audio-sub-lbl { font-size: .66rem; color: rgba(255,255,255,.42); }
+.audio-waveform { display: flex; align-items: center; gap: 2px; height: 26px; margin-bottom: .45rem; }
+.wv-bar { flex: 1; background: rgba(255,255,255,.12); border-radius: 2px; cursor: pointer; transition: background .1s; }
+.wv-bar.played { background: #818CF8; }
+.audio-times { display: flex; justify-content: space-between; font-size: .62rem; color: rgba(255,255,255,.3); margin-bottom: .7rem; }
+.audio-ctrl { display: flex; align-items: center; justify-content: center; gap: .4rem; }
+.aud-btn {
+    background: none; border: none; color: rgba(255,255,255,.5); cursor: pointer;
+    width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; font-size: .82rem; transition: all .15s;
+}
+.aud-btn:hover { color: white; background: rgba(255,255,255,.08); }
+.aud-play {
+    width: 36px; height: 36px; background: #6366F1; border-radius: 50%;
+    color: white; font-size: .9rem;
+}
+.aud-play:hover { background: #818CF8; transform: scale(1.05); }
+.aud-speed {
+    font-size: .64rem; background: rgba(255,255,255,.08); color: rgba(255,255,255,.45);
+    border: none; border-radius: 4px; padding: .12rem .35rem; cursor: pointer; margin-left: auto;
+}
+
+/* VOCAB LIST */
+.vocab-list { display: flex; flex-direction: column; gap: .45rem; }
+.vocab-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: .55rem .7rem; border-radius: 9px; border: 1px solid #EAECF2;
+    cursor: pointer; transition: all .13s;
+}
+.vocab-item:hover { border-color: #6366F1; background: #EEF2FF; }
+.vocab-word { font-size: .82rem; font-weight: 600; color: #0F172A; }
+.vocab-mean { font-size: .68rem; color: #94A3B8; margin-top: 1px; }
+.vbadge {
+    font-size: .58rem; font-weight: 700; padding: .18rem .42rem;
+    border-radius: 4px; text-transform: uppercase; letter-spacing: .04em; flex-shrink: 0;
+}
+.vbv { background: #FEF2F2; color: #DC2626; }
+.vbn { background: #EFF6FF; color: #2563EB; }
+.vba { background: #F5F3FF; color: #7C3AED; }
+
+/* CONTEXT CARD */
+.ctx-card { background: #FAFBFF; border-radius: 11px; overflow: hidden; border: 1px solid #EAECF2; }
+.ctx-img {
+    height: 72px; display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+}
+.ctx-img img { width: 100%; height: 100%; object-fit: cover; }
+.ctx-body { padding: .75rem; }
+.ctx-title { font-size: .82rem; font-weight: 700; color: #0F172A; margin-bottom: .3rem; }
+.ctx-text { font-size: .74rem; color: #6B7280; line-height: 1.55; }
+.ctx-link { display: inline-flex; align-items: center; gap: .25rem; font-size: .7rem; font-weight: 600; color: #6366F1; margin-top: .5rem; cursor: pointer; }
+.ctx-link:hover { text-decoration: underline; }
+
+/* KEY TERMS */
+.kterm-list { display: flex; flex-direction: column; gap: .45rem; }
+.kterm {
+    padding: .65rem .75rem; background: #FAFBFF; border-radius: 9px; border: 1px solid #EAECF2;
+}
+.kterm-word { font-family: 'Playfair Display', serif; font-size: .88rem; font-weight: 700; color: #6366F1; margin-bottom: .18rem; }
+.kterm-def { font-size: .74rem; color: #6B7280; line-height: 1.5; }
+.kterm-ky { font-size: .66rem; color: #C4C9D4; font-style: italic; margin-top: .15rem; }
+
+/* STUDY GUIDE BTN */
+.btn-study {
+    display: flex; align-items: center; justify-content: center;
+    width: calc(100% - 2.2rem); margin: 1rem 1.1rem;
+    padding: .72rem; background: #0F172A; color: white; border: none;
+    border-radius: 9px; font-family: 'Inter', sans-serif;
+    font-size: .82rem; font-weight: 600; cursor: pointer; transition: opacity .15s;
+}
+.btn-study:hover { opacity: .85; }
+
+/* WORD TOOLTIP */
+.word-tooltip {
+    position: fixed; z-index: 9999; background: white;
+    border: 1px solid #EAECF2; border-radius: 13px;
+    box-shadow: 0 16px 48px rgba(0,0,0,.13), 0 4px 16px rgba(99,102,241,.1);
+    width: 272px; overflow: hidden; display: none;
+    animation: ttIn .18s cubic-bezier(.34,1.56,.64,1);
+}
+.word-tooltip.show { display: block; }
+@keyframes ttIn { from{opacity:0;transform:translateY(5px) scale(.96)} to{opacity:1;transform:translateY(0) scale(1)} }
+.tt-head {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    padding: .85rem .95rem .7rem; border-bottom: 1px solid #EAECF2;
+}
+.tt-word { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 700; color: #0F172A; }
+.tt-pron { font-size: .7rem; color: #C4C9D4; font-style: italic; margin-top: .12rem; }
+.tt-type-badge {
+    font-size: .6rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .05em; padding: .18rem .45rem; border-radius: 5px; margin-top: .15rem; flex-shrink: 0;
+}
+.tt-body { padding: .75rem .95rem; }
+.tt-trans { font-size: .95rem; font-weight: 600; color: #6366F1; margin-bottom: .35rem; }
+.tt-example { background: #FAFBFF; border-radius: 8px; padding: .55rem .7rem; margin-bottom: .6rem; }
+.tt-ex-ky { font-size: .78rem; color: #374151; margin-bottom: .18rem; line-height: 1.5; }
+.tt-ex-en { font-size: .7rem; color: #94A3B8; font-style: italic; }
+.tt-foot {
+    display: flex; gap: .45rem; padding: .65rem .95rem;
+    border-top: 1px solid #EAECF2; background: #FAFBFF;
+}
+.tt-btn {
+    flex: 1; padding: .4rem; border-radius: 7px; border: 1.5px solid #E5E7EB;
+    background: white; font-size: .68rem; font-weight: 600; color: #6B7280;
+    cursor: pointer; transition: all .13s; font-family: 'Inter', sans-serif;
+    display: flex; align-items: center; justify-content: center; gap: .3rem;
+}
+.tt-btn:hover { border-color: #6366F1; color: #6366F1; background: #EEF2FF; }
+.tt-btn.primary { background: #6366F1; color: white; border-color: #6366F1; }
+.tt-btn.primary:hover { background: #4F46E5; }
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #A5B4FC; }
+
+@media(max-width: 768px) {
+    .books-grid { grid-template-columns: 1fr 1fr; }
+    .chapter-nav, .reader-sidebar { display: none; }
+    .reader-main { padding: 1.5rem; }
+    .lit-hero { padding: 2rem 1.25rem; }
+}
+@media(max-width: 480px) {
+    .books-grid { grid-template-columns: 1fr; }
+}
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="page-container lit">
+
+    <!-- HERO -->
+    <div class="lit-hero">
+        <div class="lit-hero-tag">Library</div>
+        <h1>Kyrgyz Literature</h1>
+        <p>Read classic Kyrgyz texts with interactive word translation and cultural context — one tap per word.</p>
+        <div class="hero-stats-row">
+            <div class="hstat"><span class="hstat-n">6</span><span class="hstat-l">Books</span></div>
+            <div class="hstat"><span class="hstat-n">{{ stats.lit_reading if stats else 2 }}</span><span class="hstat-l">In progress</span></div>
+            <div class="hstat"><span class="hstat-n">{{ stats.words_learned if stats else 0 }}</span><span class="hstat-l">Words learned</span></div>
+        </div>
+    </div>
+
+    <!-- FILTER BAR -->
+    <div class="filter-bar">
+        <span class="filter-lbl">Filter:</span>
+        <button class="fchip active" onclick="filterBooks(this,'all')">All</button>
+        <button class="fchip" onclick="filterBooks(this,'beginner')">Beginner</button>
+        <button class="fchip" onclick="filterBooks(this,'intermediate')">Intermediate</button>
+        <button class="fchip" onclick="filterBooks(this,'advanced')">Advanced</button>
+        <button class="fchip" onclick="filterBooks(this,'novel')">Novel</button>
+        <button class="fchip" onclick="filterBooks(this,'epic')">Epic</button>
+    </div>
+
+    <!-- BOOKS GRID -->
+    <div class="sec-label">All books</div>
+    <div class="books-grid" id="booksGrid">
+
+        <!-- JAMILA -->
+        <div class="book-card" onclick="openReader('jamila')" data-level="intermediate" data-genre="novel">
+            <div class="bc-cover" style="background: linear-gradient(135deg,#134e4a 0%,#0f766e 100%)">
+                <div class="bc-cover-pattern"></div>
+                <div class="bc-title-cover">Jamila</div>
+                <div class="bc-author-cover">Chyngyz Aitmatov</div>
+            </div>
+            <div class="bc-body">
+                <div class="bc-tags">
+                    <span class="bc-tag tag-intermediate">Intermediate</span>
+                    <span class="bc-tag tag-genre">Novel</span>
+                </div>
+                <div class="bc-title">Jamila</div>
+                <div class="bc-author">Chyngyz Aitmatov</div>
+                <div class="bc-desc">A timeless wartime love story set in Kyrgyzstan — one of the most translated Soviet novels.</div>
+                <div class="bc-footer">
+                    <span class="bc-pages">148 pages</span>
+                    <div class="bc-progress">
+                        <span class="bc-prog-lbl">8% read</span>
+                        <div class="bc-prog-bar"><div class="bc-prog-fill" style="width:8%"></div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="bc-cta">Continue reading →</div>
+        </div>
+
+        <!-- THE WHITE SHIP -->
+        <div class="book-card" onclick="openReader('whiteship')" data-level="advanced" data-genre="novel">
+            <div class="bc-cover" style="background: linear-gradient(135deg,#0c4a6e 0%,#0369a1 100%)">
+                <div class="bc-cover-pattern"></div>
+                <div class="bc-title-cover">The White Ship</div>
+                <div class="bc-author-cover">Chyngyz Aitmatov</div>
+            </div>
+            <div class="bc-body">
+                <div class="bc-tags">
+                    <span class="bc-tag tag-advanced">Advanced</span>
+                    <span class="bc-tag tag-genre">Novel</span>
+                </div>
+                <div class="bc-title">The White Ship</div>
+                <div class="bc-author">Chyngyz Aitmatov</div>
+                <div class="bc-desc">A boy in the Tian Shan mountains finds refuge in fairy tales — a poetic fable written against harsh reality.</div>
+                <div class="bc-footer">
+                    <span class="bc-pages">192 pages</span>
+                    <div class="bc-progress">
+                        <span class="bc-prog-lbl">Not started</span>
+                        <div class="bc-prog-bar"><div class="bc-prog-fill" style="width:0%"></div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="bc-cta">Start reading →</div>
+        </div>
+
+        <!-- MANAS EPIC -->
+        <div class="book-card" onclick="openReader('manas')" data-level="advanced" data-genre="epic">
+            <div class="bc-cover" style="background: linear-gradient(135deg,#7c2d12 0%,#b45309 100%)">
+                <div class="bc-cover-pattern"></div>
+                <div class="bc-title-cover">Epic of Manas</div>
+                <div class="bc-author-cover">Oral Folk Tradition</div>
+            </div>
+            <div class="bc-body">
+                <div class="bc-tags">
+                    <span class="bc-tag tag-advanced">Advanced</span>
+                    <span class="bc-tag tag-epic">Epic</span>
+                </div>
+                <div class="bc-title">Epic of Manas</div>
+                <div class="bc-author">Oral Folk Tradition</div>
+                <div class="bc-desc">The world's longest oral epic — the core of Kyrgyz national identity, a saga of heroism and heritage.</div>
+                <div class="bc-footer">
+                    <span class="bc-pages">500+ pages</span>
+                    <div class="bc-progress">
+                        <span class="bc-prog-lbl">Not started</span>
+                        <div class="bc-prog-bar"><div class="bc-prog-fill" style="width:0%"></div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="bc-cta">Start reading →</div>
+        </div>
+
+        <!-- MOTHER'S FIELD -->
+        <div class="book-card" onclick="openReader('motherfield')" data-level="intermediate" data-genre="novel">
+            <div class="bc-cover" style="background: linear-gradient(135deg,#422006 0%,#854d0e 100%)">
+                <div class="bc-cover-pattern"></div>
+                <div class="bc-title-cover">Mother's Field</div>
+                <div class="bc-author-cover">Chyngyz Aitmatov</div>
+            </div>
+            <div class="bc-body">
+                <div class="bc-tags">
+                    <span class="bc-tag tag-intermediate">Intermediate</span>
+                    <span class="bc-tag tag-genre">Novel</span>
+                </div>
+                <div class="bc-title">Mother's Field</div>
+                <div class="bc-author">Chyngyz Aitmatov</div>
+                <div class="bc-desc">A Kyrgyz woman's voice during wartime — a deep novella about sacrifice and endurance.</div>
+                <div class="bc-footer">
+                    <span class="bc-pages">96 pages</span>
+                    <div class="bc-progress">
+                        <span class="bc-prog-lbl">Not started</span>
+                        <div class="bc-prog-bar"><div class="bc-prog-fill" style="width:0%"></div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="bc-cta">Start reading →</div>
+        </div>
+
+        <!-- FIRST STORIES (BEGINNER) -->
+        <div class="book-card" onclick="openReader('stories')" data-level="beginner" data-genre="short">
+            <div class="bc-cover" style="background: linear-gradient(135deg,#1e3a5f 0%,#1a4080 100%)">
+                <div class="bc-cover-pattern"></div>
+                <div class="bc-title-cover">First Stories</div>
+                <div class="bc-author-cover">Kyrgyz Writers</div>
+            </div>
+            <div class="bc-body">
+                <div class="bc-tags">
+                    <span class="bc-tag tag-beginner">Beginner</span>
+                    <span class="bc-tag tag-genre">Short Stories</span>
+                </div>
+                <div class="bc-title">First Stories</div>
+                <div class="bc-author">Various Kyrgyz Authors</div>
+                <div class="bc-desc">Accessible short stories adapted for learners — builds reading confidence in Kyrgyz step by step.</div>
+                <div class="bc-footer">
+                    <span class="bc-pages">84 pages</span>
+                    <div class="bc-progress">
+                        <span class="bc-prog-lbl">45% read</span>
+                        <div class="bc-prog-bar"><div class="bc-prog-fill" style="width:45%"></div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="bc-cta">Continue reading →</div>
+        </div>
+
+        <!-- THE SCAFFOLD -->
+        <div class="book-card" onclick="openReader('scaffold')" data-level="advanced" data-genre="novel">
+            <div class="bc-cover" style="background: linear-gradient(135deg,#1a1a2e 0%,#0f3460 100%)">
+                <div class="bc-cover-pattern"></div>
+                <div class="bc-title-cover">The Scaffold</div>
+                <div class="bc-author-cover">Chyngyz Aitmatov</div>
+            </div>
+            <div class="bc-body">
+                <div class="bc-tags">
+                    <span class="bc-tag tag-advanced">Advanced</span>
+                    <span class="bc-tag tag-genre">Novel</span>
+                </div>
+                <div class="bc-title">The Scaffold</div>
+                <div class="bc-author">Chyngyz Aitmatov</div>
+                <div class="bc-desc">Wolves on the steppe, a drug addict, and biblical Christ woven together in a search for moral truth.</div>
+                <div class="bc-footer">
+                    <span class="bc-pages">320 pages</span>
+                    <div class="bc-progress">
+                        <span class="bc-prog-lbl">Not started</span>
+                        <div class="bc-prog-bar"><div class="bc-prog-fill" style="width:0%"></div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="bc-cta">Start reading →</div>
+        </div>
+
+    </div>
+
+</div><!-- /lit -->
+
+
+<!-- ══════════════ READER MODAL ══════════════ -->
+<div class="modal-overlay" id="readerModal">
+  <div class="modal-reader">
+
+    <!-- TOP BAR -->
+    <div class="reader-topbar">
+        <span class="rt-eyebrow">Reading</span>
+        <span class="rt-title" id="rtTitle">—</span>
+        <span class="rt-sep">·</span>
+        <span class="rt-author" id="rtAuthor">—</span>
+        <div class="rt-progress-wrap">
+            <div class="rt-prog-bar"><div class="rt-prog-fill" id="rtProgFill" style="width:8%"></div></div>
+            <span class="rt-prog-lbl" id="rtProgLbl">Page 12 of 148</span>
+        </div>
+        <div class="rt-actions">
+            <button class="rt-btn" id="highlightToggle" onclick="toggleHighlight(this)" title="Highlight mode">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 10l2.5-2.5 5-5a1.77 1.77 0 012.5 2.5l-5 5L4.5 12 2 10z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M1.5 12.5h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            </button>
+            <button class="rt-btn" onclick="changeFontSize()" title="Font size">Aa</button>
+            <button class="rt-btn" onclick="closeReader()" title="Close">✕</button>
+        </div>
+    </div>
+
+    <div class="reader-body">
+
+        <!-- CHAPTER NAV -->
+        <div class="chapter-nav" id="chapterNav">
+            <div class="cn-label">Chapters</div>
+            <!-- filled by JS -->
+        </div>
+
+        <!-- READER MAIN -->
+        <div class="reader-main">
+            <div class="reading-text" id="readingText">
+                <!-- filled by JS -->
+            </div>
+        </div>
+
+        <!-- SIDEBAR -->
+        <div class="reader-sidebar">
+
+            <!-- Audio -->
+            <div class="sb-panel">
+                <div class="sb-panel-head" onclick="togglePanel('audio')">
+                    <span class="sb-tag">Audio companion</span>
+                    <span class="sb-toggle" id="audio-toggle">▾</span>
+                </div>
+                <div class="sb-body" id="audio-body">
+                    <div class="audio-card">
+                        <div class="audio-head">
+                            <div class="audio-icon">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 5.5h2l3-3v11l-3-3H2v-5zM11 4.5a5 5 0 010 7M13 2.5a8 8 0 010 11" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </div>
+                            <div>
+                                <div class="audio-track" id="audioTrackName">Narrated by Elnura Isakova</div>
+                                <div class="audio-sub-lbl" id="audioChapter">Kyrgyz Original · Chapter I</div>
+                            </div>
+                        </div>
+                        <div class="audio-waveform" id="waveform"></div>
+                        <div class="audio-times">
+                            <span id="audioTime">2:14</span>
+                            <span>8:30</span>
+                        </div>
+                        <div class="audio-ctrl">
+                            <button class="aud-btn">↺</button>
+                            <button class="aud-btn">⏮</button>
+                            <button class="aud-btn aud-play" id="playBtn" onclick="togglePlay()">▶</button>
+                            <button class="aud-btn">⏭</button>
+                            <select class="aud-speed">
+                                <option value="0.75">0.75×</option>
+                                <option value="1" selected>1×</option>
+                                <option value="1.25">1.25×</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vocab -->
+            <div class="sb-panel">
+                <div class="sb-panel-head" onclick="togglePanel('vocab')">
+                    <span class="sb-tag">Chapter vocabulary</span>
+                    <span class="sb-toggle" id="vocab-toggle">▾</span>
+                </div>
+                <div class="sb-body" id="vocab-body">
+                    <div class="vocab-list" id="vocabList"><!-- filled by JS --></div>
+                </div>
+            </div>
+
+            <!-- Cultural context -->
+            <div class="sb-panel">
+                <div class="sb-panel-head" onclick="togglePanel('ctx')">
+                    <span class="sb-tag">Cultural context</span>
+                    <span class="sb-toggle" id="ctx-toggle">▾</span>
+                </div>
+                <div class="sb-body" id="ctx-body">
+                    <div class="ctx-card">
+                        <div class="ctx-img"><img id="ctxImg" src="" alt=""/></div>
+                        <div class="ctx-body">
+                            <div class="ctx-title" id="ctxTitle">—</div>
+                            <p class="ctx-text" id="ctxText">—</p>
+                            <span class="ctx-link">Read more →</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Key terms -->
+            <div class="sb-panel">
+                <div class="sb-panel-head" onclick="togglePanel('terms')">
+                    <span class="sb-tag">Key terms</span>
+                    <span class="sb-toggle" id="terms-toggle">▾</span>
+                </div>
+                <div class="sb-body" id="terms-body">
+                    <div class="kterm-list" id="ktermList"><!-- filled by JS --></div>
+                </div>
+            </div>
+
+            <button class="btn-study">Explore study guide →</button>
+        </div>
+
+    </div><!-- /reader-body -->
+  </div>
+</div>
+
+
+<!-- WORD TOOLTIP -->
+<div class="word-tooltip" id="wordTooltip">
+    <div class="tt-head">
+        <div>
+            <div class="tt-word" id="ttWord"></div>
+            <div class="tt-pron" id="ttPron"></div>
+        </div>
+        <div class="tt-type-badge" id="ttType"></div>
+    </div>
+    <div class="tt-body">
+        <div class="tt-trans" id="ttTrans"></div>
+        <div class="tt-example">
+            <div class="tt-ex-ky" id="ttExKy"></div>
+            <div class="tt-ex-en" id="ttExEn"></div>
+        </div>
+    </div>
+    <div class="tt-foot">
+        <button class="tt-btn">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 3h3l2-2v8l-2-2H2V3zM8 2.5a3.5 3.5 0 010 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            Pronounce
+        </button>
+        <button class="tt-btn primary" onclick="addFlashcard()">+ Add flashcard</button>
+    </div>
+</div>
+
+
+<script>
+/* ────────────────────────────────────────────────
+   BOOK DATA — unique content per book
+──────────────────────────────────────────────── */
+const BOOKS = {
+    jamila: {
+        title: 'Jamila', author: 'Chyngyz Aitmatov',
+        totalPages: 148, currentPage: 12,
+        chapters: ['The Return','The Valley Summer','The Song of Daniyar','August Nights','The Parting','Memory','The Field','Endings'],
+        activeChapter: 1,
+        context: {
+            img: 'https://images.unsplash.com/photo-1565608087341-404b25492fee?w=500&q=75',
+            title: 'The Setting: Talas Valley',
+            text: 'Aitmatov captures wartime Talas during WWII. The landscape is a character — its vast golden fields mirror Jamila\'s longing for freedom.'
+        },
+        vocab: [
+            {ky:'жымжырт', en:'quiet, peaceful', type:'adj'},
+            {ky:'эркиндикке', en:'towards freedom', type:'noun'},
+            {ky:'умтулган', en:'striving for', type:'verb'},
+            {ky:'сезилчү', en:'it felt / seemed', type:'verb'},
+            {ky:'башкача', en:'different, another', type:'adj'},
+        ],
+        terms: [
+            {word:'Айыл (Аул)', def:'Traditional Kyrgyz village — the heart of rural community life.', ky:'айыл — village'},
+            {word:'Жайлоо', def:'Summer mountain pasture where herders move their flocks each season.', ky:'жайлоо — summer pasture'},
+        ],
+        text: `
+<p class="lead">
+    Мен кайрадан ошол
+    <span class="w type-adj" data-word="кичинекей" data-trans="small, little" data-gram="Adjective" data-pron="ki-chi-ne-key" data-ex-ky="Кичинекей бала ойнойт." data-ex-en="The little child plays.">кичинекей</span>
+    <span class="w type-noun" data-word="айылга" data-trans="to the village" data-gram="Noun (dative)" data-pron="a-yyl-ga" data-ex-ky="Айылга кайттым." data-ex-en="I returned to the village.">айылга</span>
+    <span class="w type-verb" data-word="келдим" data-trans="I came / I arrived" data-gram="Verb (past, 1st person)" data-pron="kel-dim" data-ex-ky="Мен үйгө келдим." data-ex-en="I came home.">келдим</span>.
+    <span class="w type-noun" data-word="Тоолор" data-trans="The mountains" data-gram="Noun (plural)" data-pron="too-lor" data-ex-ky="Тоолор бийик." data-ex-en="The mountains are high.">Тоолор</span>
+    дагы эле ошол эле боюнча
+    <span class="w type-verb" data-word="өзгөрүптүр" data-trans="seems to have changed" data-gram="Verb (evidential past)" data-pron="öz-gö-rüp-tür" data-ex-ky="Дүйнө өзгөрүптүр." data-ex-en="The world seems to have changed.">өзгөрүптүр</span>.
+</p>
+<p>
+    Анын
+    <span class="w type-noun" data-word="көздөрүндө" data-trans="in her eyes" data-gram="Noun (locative, possessive)" data-pron="köz-dö-rün-dö" data-ex-ky="Анын көздөрүндө нур бар." data-ex-en="There is light in her eyes.">көздөрүндө</span>
+    <span class="w type-adj" data-word="башкача" data-trans="different, another kind of" data-gram="Adjective" data-pron="bash-ka-cha" data-ex-ky="Бул башкача нерсе." data-ex-en="This is a different thing.">башкача</span>
+    бир нур бар эле. Бул жөнөкөй гана аялдын көзү эмес,
+    <span class="w type-noun" data-word="эркиндикке" data-trans="towards freedom" data-gram="Noun (dative)" data-pron="er-kin-dik-ke" data-ex-ky="Эркиндикке умтулуу." data-ex-en="Striving for freedom.">эркиндикке</span>
+    <span class="w type-verb" data-word="умтулган" data-trans="striving / reaching for" data-gram="Verb (participle)" data-pron="um-tul-gan" data-ex-ky="Ал максатка умтулган." data-ex-en="She strived for her goal.">умтулган</span>
+    адамдын көзү болчу.
+    <span class="w type-noun" data-word="Августтун" data-trans="August's / of August" data-gram="Proper noun (genitive)" data-pron="Av-gus-tun" data-ex-ky="Августтун аптабы күйдүрөт." data-ex-en="August's heat scorches.">Августтун</span>
+    <span class="w type-adj" data-word="жылуу" data-trans="warm" data-gram="Adjective" data-pron="zhy-luu" data-ex-ky="Жылуу күн." data-ex-en="A warm day.">жылуу</span>
+    түндөрү бизди жакындатты.
+</p>
+<p>
+    <span class="w type-noun" data-word="Даниярым" data-trans="my Daniyar (affectionate)" data-gram="Proper noun (possessive)" data-pron="Da-ni-yar-ym" data-ex-ky="Даниярым ырдаганды жакшы көрчү." data-ex-en="My Daniyar loved to sing.">Даниярым</span>
+    <span class="w type-verb" data-word="ырдаганда" data-trans="when (he) sang" data-gram="Verb (temporal converb)" data-pron="yr-da-gan-da" data-ex-ky="Ырдаганда баары тынчыды." data-ex-en="When he sang, everything was calm.">ырдаганда</span>,
+    бүт дүйнө токтоп
+    <span class="w type-verb" data-word="калгандай" data-trans="as if it had stopped" data-gram="Verb (comparative converb)" data-pron="kal-gan-day" data-ex-ky="Убакыт токтоп калгандай." data-ex-en="As if time had stopped.">калгандай</span>
+    <span class="w type-verb" data-word="сезилчү" data-trans="it felt / was perceived" data-gram="Verb (habitual past)" data-pron="se-zil-chü" data-ex-ky="Бакыт сезилчү ошол убакта." data-ex-en="Happiness could be felt at that time.">сезилчү</span>.
+    Арабалардын
+    <span class="w type-noun" data-word="үнү" data-trans="its sound / voice" data-gram="Noun (possessive)" data-pron="ü-nü" data-ex-ky="Музыканын үнү жагымдуу." data-ex-en="The sound of music is pleasant.">үнү</span>,
+    аттардын
+    <span class="w type-noun" data-word="бышкырыгы" data-trans="their snorting / neighing" data-gram="Noun (possessive)" data-pron="bysh-ky-ry-gy" data-ex-ky="Аттын бышкырыгы укмуш." data-ex-en="The horse's snort is remarkable.">бышкырыгы</span>
+    дагы эле кулагымда.
+</p>`
+    },
+
+    whiteship: {
+        title: 'The White Ship', author: 'Chyngyz Aitmatov',
+        totalPages: 192, currentPage: 1,
+        chapters: ['The Grandfather','The Horned Deer Mother','The Boy\'s Dream','The Lake','The White Ship','Awakening','The End of the Tale'],
+        activeChapter: 0,
+        context: {
+            img: 'https://images.unsplash.com/photo-1609198092458-38a293c7ac4b?w=500&q=75',
+            title: 'Tian Shan Mountains',
+            text: 'The story is set in a remote Tian Shan forest reserve. The isolation of the setting amplifies the boy\'s inner world and the contrast between myth and brutal reality.'
+        },
+        vocab: [
+            {ky:'бала', en:'boy / child', type:'noun'},
+            {ky:'жомок', en:'fairy tale / legend', type:'noun'},
+            {ky:'ак кеме', en:'white ship', type:'noun'},
+            {ky:'сагыныч', en:'longing, yearning', type:'noun'},
+            {ky:'кыял', en:'dream, imagination', type:'noun'},
+        ],
+        terms: [
+            {word:'Марал-Эне', def:'The Horned Deer Mother — a mythological ancestor figure in Kyrgyz oral tradition.', ky:'марал — deer, эне — mother'},
+            {word:'Ысык-Көл', def:'Central Asia\'s largest alpine lake, sacred in Kyrgyz culture and history.', ky:'ысык — warm, көл — lake'},
+        ],
+        text: `
+<p class="lead">
+    <span class="w type-noun" data-word="Бала" data-trans="The boy / child" data-gram="Noun" data-pron="ba-la" data-ex-ky="Бала ойноп жатат." data-ex-en="The boy is playing.">Бала</span>
+    <span class="w type-adj" data-word="жалгыз" data-trans="alone, solitary" data-gram="Adjective" data-pron="zhal-gyz" data-ex-ky="Ал жалгыз жашайт." data-ex-en="He lives alone.">жалгыз</span>
+    <span class="w type-verb" data-word="отурду" data-trans="sat down / was sitting" data-gram="Verb (past tense)" data-pron="o-tur-du" data-ex-ky="Бала ташка отурду." data-ex-en="The boy sat on a stone.">отурду</span>.
+    Алыста, суунун аркы жагында,
+    <span class="w type-adj" data-word="ак" data-trans="white" data-gram="Adjective" data-pron="ak" data-ex-ky="Ак кар жаады." data-ex-en="White snow fell.">ак</span>
+    <span class="w type-noun" data-word="кеме" data-trans="ship / vessel" data-gram="Noun" data-pron="ke-me" data-ex-ky="Кеме сууда жүздү." data-ex-en="The ship sailed on the water.">кеме</span>
+    <span class="w type-verb" data-word="жылып бара жатты" data-trans="was slowly moving / gliding" data-gram="Verb (present continuous)" data-pron="zhy-lyp ba-ra zhat-ty" data-ex-ky="Булут жылып бара жатты." data-ex-en="The cloud was slowly moving.">жылып бара жатты</span>.
+</p>
+<p>
+    Бул анын
+    <span class="w type-noun" data-word="кыялы" data-trans="his dream / imagination" data-gram="Noun (possessive)" data-pron="ky-ya-ly" data-ex-ky="Анын кыялы чоң." data-ex-en="His dream is big.">кыялы</span>
+    эле — ошол кемеге
+    <span class="w type-verb" data-word="жетүү" data-trans="to reach / to get to" data-gram="Verb (infinitive)" data-pron="zhe-tüü" data-ex-ky="Максатка жетүү кыйын." data-ex-en="Reaching the goal is difficult.">жетүү</span>.
+    <span class="w type-noun" data-word="Тоолор" data-trans="The mountains" data-gram="Noun (plural)" data-pron="too-lor" data-ex-ky="Тоолор бийик." data-ex-en="The mountains are high.">Тоолор</span>
+    аны
+    <span class="w type-verb" data-word="курчап турган" data-trans="surrounding / encircling" data-gram="Verb (participle)" data-pron="kur-chap tur-gan" data-ex-ky="Токой аны курчап турган." data-ex-en="The forest surrounded him.">курчап турган</span>,
+    бирок
+    <span class="w type-noun" data-word="жаны" data-trans="his soul / spirit" data-gram="Noun (possessive)" data-pron="zha-ny" data-ex-ky="Анын жаны тынч." data-ex-en="His soul is at peace.">жаны</span>
+    алыска учуп
+    <span class="w type-verb" data-word="кетчү" data-trans="would fly away / used to escape" data-gram="Verb (habitual past)" data-pron="ket-chü" data-ex-ky="Ал дайыма качып кетчү." data-ex-en="He would always run away.">кетчү</span>.
+</p>
+<p>
+    <span class="w type-noun" data-word="Жомоктор" data-trans="The fairy tales / legends" data-gram="Noun (plural)" data-pron="zho-mok-tor" data-ex-ky="Жомоктор кызыктуу." data-ex-en="Fairy tales are interesting.">Жомоктор</span>
+    — бул анын жалгыз
+    <span class="w type-noun" data-word="досу" data-trans="his only friend" data-gram="Noun (possessive)" data-pron="do-su" data-ex-ky="Анын досу жок." data-ex-en="He has no friend.">досу</span>
+    болчу. Чоң атасы айткан
+    <span class="w type-noun" data-word="Марал-Эне" data-trans="Horned Deer Mother (mythical ancestor)" data-gram="Proper noun" data-pron="Ma-ral E-ne" data-ex-ky="Марал-Эне биздин энебиз." data-ex-en="Deer Mother is our ancestor.">Марал-Эне</span>
+    жөнүндөгү
+    <span class="w type-noun" data-word="уламыш" data-trans="legend / ancient tale" data-gram="Noun" data-pron="u-la-mysh" data-ex-ky="Уламыш эл арасында жашайт." data-ex-en="The legend lives among the people.">уламыш</span>
+    анын
+    <span class="w type-noun" data-word="жүрөгүндө" data-trans="in his heart" data-gram="Noun (locative, possessive)" data-pron="zhü-rö-gün-dö" data-ex-ky="Сүйүү жүрөгүндө жашайт." data-ex-en="Love lives in his heart.">жүрөгүндө</span>
+    <span class="w type-verb" data-word="жашачу" data-trans="used to live / dwelled" data-gram="Verb (habitual past)" data-pron="zha-sha-chu" data-ex-ky="Алар токойдо жашачу." data-ex-en="They used to live in the forest.">жашачу</span>.
+</p>`
+    },
+
+    manas: {
+        title: 'Epic of Manas', author: 'Oral Folk Tradition',
+        totalPages: 500, currentPage: 1,
+        chapters: ['Birth of Manas','The Young Warrior','The Great Battle','Alliance of Clans','Chabdar the Horse','The Victory','Legacy of Manas'],
+        activeChapter: 0,
+        context: {
+            img: 'https://images.unsplash.com/photo-1572883454114-1cf0031ede2a?w=500&q=75',
+            title: 'The Манасчы Tradition',
+            text: 'Манасчы are the traditional narrators of Manas — revered performers who memorised tens of thousands of lines. Sayakbai Karalaev could recite over 500,000 verses from memory.'
+        },
+        vocab: [
+            {ky:'баатыр', en:'hero / warrior', type:'noun'},
+            {ky:'элдин', en:'of the people', type:'noun'},
+            {ky:'жоого', en:'against the enemy', type:'noun'},
+            {ky:'кылыч', en:'sword', type:'noun'},
+            {ky:'намыс', en:'honour / dignity', type:'noun'},
+        ],
+        terms: [
+            {word:'Манасчы', def:'A traditional singer-narrator of the Manas epic — a revered, almost sacred cultural role.', ky:'манасчы — epic narrator'},
+            {word:'Ак калпак', def:'The white felt hat — a symbol of Kyrgyz male identity, featured prominently in Manas.', ky:'ак — white, калпак — felt hat'},
+        ],
+        text: `
+<p class="lead">
+    <span class="w type-noun" data-word="Манас" data-trans="Manas (the hero)" data-gram="Proper noun" data-pron="Ma-nas" data-ex-ky="Манас — эл баатыры." data-ex-en="Manas is the people's hero.">Манас</span>
+    <span class="w type-noun" data-word="элдин" data-trans="of the people / the nation's" data-gram="Noun (genitive)" data-pron="el-din" data-ex-ky="Элдин каалоосу — бейпилчилик." data-ex-en="The people's wish is peace.">элдин</span>
+    <span class="w type-noun" data-word="баатыры" data-trans="hero / warrior" data-gram="Noun (possessive)" data-pron="baa-ty-ry" data-ex-ky="Ал — чыныгы баатыр." data-ex-en="He is a true hero.">баатыры</span>
+    болчу —
+    <span class="w type-adj" data-word="күчтүү" data-trans="strong, powerful" data-gram="Adjective" data-pron="küch-tüü" data-ex-ky="Манас күчтүү болгон." data-ex-en="Manas was strong.">күчтүү</span>,
+    <span class="w type-adj" data-word="акылдуу" data-trans="wise, intelligent" data-gram="Adjective" data-pron="a-kyl-duu" data-ex-ky="Акылдуу адам аз сүйлөйт." data-ex-en="A wise person speaks little.">акылдуу</span>,
+    <span class="w type-noun" data-word="намысы" data-trans="his honour / dignity" data-gram="Noun (possessive)" data-pron="na-my-sy" data-ex-ky="Намысы бийик болгон." data-ex-en="His honour was great.">намысы</span>
+    бийик болгон.
+</p>
+<p>
+    <span class="w type-adj" data-word="Жаш" data-trans="young" data-gram="Adjective" data-pron="zhash" data-ex-ky="Жаш баатыр жоого чыкты." data-ex-en="The young warrior went to battle.">Жаш</span>
+    <span class="w type-noun" data-word="кезинде" data-trans="in his youth / in those times" data-gram="Noun (locative)" data-pron="ke-zin-de" data-ex-ky="Жаш кезинде чоң болгом." data-ex-en="I was big in my youth.">кезинде</span>
+    эле ал
+    <span class="w type-noun" data-word="жоого" data-trans="against the enemy / to battle" data-gram="Noun (dative)" data-pron="zhoo-go" data-ex-ky="Жоого чыгуу — намыс." data-ex-en="Going to battle is honour.">жоого</span>
+    <span class="w type-verb" data-word="чыккан" data-trans="went out / rose against" data-gram="Verb (past participle)" data-pron="chyk-kan" data-ex-ky="Ал эртелеп жолго чыккан." data-ex-en="He set out early on the road.">чыккан</span>.
+    Анын
+    <span class="w type-noun" data-word="кылычы" data-trans="his sword" data-gram="Noun (possessive)" data-pron="ky-ly-chy" data-ex-ky="Кылычы жарык чагылды." data-ex-en="His sword flashed with light.">кылычы</span>
+    <span class="w type-noun" data-word="күндүн" data-trans="of the sun" data-gram="Noun (genitive)" data-pron="kün-dün" data-ex-ky="Күндүн жарыгы." data-ex-en="The light of the sun.">күндүн</span>
+    нурунда
+    <span class="w type-verb" data-word="жаркыды" data-trans="shone / gleamed / flashed" data-gram="Verb (past tense)" data-pron="zhar-ky-dy" data-ex-ky="Жылдыздар жаркыды." data-ex-en="The stars gleamed.">жаркыды</span>.
+</p>
+<p>
+    Бүт
+    <span class="w type-noun" data-word="эл" data-trans="people / nation / folk" data-gram="Noun" data-pron="el" data-ex-ky="Эл бириккенде — күч." data-ex-en="When the people unite — there is strength.">эл</span>
+    анын
+    <span class="w type-noun" data-word="артынан" data-trans="behind him / following him" data-gram="Noun (ablative)" data-pron="ar-ty-nan" data-ex-ky="Баары артынан жүрдү." data-ex-en="Everyone followed behind him.">артынан</span>
+    <span class="w type-verb" data-word="ээрчиди" data-trans="followed / came after" data-gram="Verb (past tense)" data-pron="eer-chi-di" data-ex-ky="Балдар аны ээрчиди." data-ex-en="The children followed him.">ээрчиди</span>.
+    Алардын
+    <span class="w type-noun" data-word="жүрөктөрүндө" data-trans="in their hearts" data-gram="Noun (locative, plural possessive)" data-pron="zhü-rök-tö-rün-dö" data-ex-ky="Жүрөктөрүндө үмүт бар." data-ex-en="There is hope in their hearts.">жүрөктөрүндө</span>
+    <span class="w type-noun" data-word="үмүт" data-trans="hope" data-gram="Noun" data-pron="ü-müt" data-ex-ky="Үмүт өлбөйт." data-ex-en="Hope does not die.">үмүт</span>
+    <span class="w type-verb" data-word="жаркыды" data-trans="shone / lit up" data-gram="Verb (past tense)" data-pron="zhar-ky-dy" data-ex-ky="Жылдыздар жаркыды." data-ex-en="The stars gleamed.">жаркыды</span>.
+</p>`
+    },
+
+    motherfield: {
+        title: "Mother's Field", author: 'Chyngyz Aitmatov',
+        totalPages: 96, currentPage: 1,
+        chapters: ['The Field Speaks','The First Son','Wartime Letters','The Long Wait','Harvest Without Men','The Unnamed Grief','The Earth Endures'],
+        activeChapter: 0,
+        context: {
+            img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=500&q=75',
+            title: 'The Kyrgyz Steppe Fields',
+            text: 'Aitmatov gives voice to the land itself. The field is not scenery — it is the mother who outlives all wars, all sons, all grief. A uniquely Kyrgyz way of connecting human fate to landscape.'
+        },
+        vocab: [
+            {ky:'апа', en:'mother', type:'noun'},
+            {ky:'талаа', en:'steppe / open field', type:'noun'},
+            {ky:'кайгы', en:'grief / sorrow', type:'noun'},
+            {ky:'күтүү', en:'waiting / to wait', type:'verb'},
+            {ky:'үмүт', en:'hope', type:'noun'},
+        ],
+        terms: [
+            {word:'Колхоз', def:'Soviet collective farm — the setting of wartime Kyrgyz village life in Aitmatov\'s works.', ky:'колхоз — collective farm'},
+            {word:'Кемпир', def:'An elder woman / grandmother — a common respected figure in Kyrgyz community life.', ky:'кемпир — old woman, elder'},
+        ],
+        text: `
+<p class="lead">
+    <span class="w type-noun" data-word="Талаа" data-trans="The steppe / open field" data-gram="Noun" data-pron="ta-laa" data-ex-ky="Талаа кенен жана сонун." data-ex-en="The steppe is wide and beautiful.">Талаа</span>
+    <span class="w type-verb" data-word="сүйлөдү" data-trans="spoke / said" data-gram="Verb (past tense)" data-pron="süy-lö-dü" data-ex-ky="Ал акырын сүйлөдү." data-ex-en="She spoke quietly.">сүйлөдү</span>.
+    Ал дайыма
+    <span class="w type-verb" data-word="сүйлөйт" data-trans="speaks / always speaks" data-gram="Verb (present)" data-pron="süy-löyt" data-ex-ky="Апам жакшы сүйлөйт." data-ex-en="My mother speaks well.">сүйлөйт</span> —
+    <span class="w type-noun" data-word="жели" data-trans="its wind" data-gram="Noun (possessive)" data-pron="zhe-li" data-ex-ky="Талаанын жели суук." data-ex-en="The steppe's wind is cold.">жели</span>
+    менен,
+    <span class="w type-noun" data-word="өнүп чыгуусу" data-trans="its sprouting / growth" data-gram="Noun (verbal, possessive)" data-pron="ö-nüp chy-guu-su" data-ex-ky="Буудайдын өнүп чыгуусу жагымдуу." data-ex-en="The wheat's sprouting is beautiful.">өнүп чыгуусу</span>
+    менен.
+</p>
+<p>
+    <span class="w type-noun" data-word="Апа" data-trans="Mother" data-gram="Noun" data-pron="a-pa" data-ex-ky="Апам мени сүйөт." data-ex-en="My mother loves me.">Апа</span>
+    <span class="w type-verb" data-word="күтүп" data-trans="waiting / while waiting" data-gram="Verb (converb)" data-pron="kü-tüp" data-ex-ky="Ал күтүп жатат." data-ex-en="She is waiting.">күтүп</span>
+    жатчу — биринчи
+    <span class="w type-noun" data-word="уулу" data-trans="her first son" data-gram="Noun (possessive)" data-pron="uu-lu" data-ex-ky="Анын уулу баатыр." data-ex-en="Her son is a hero.">уулу</span>
+    <span class="w type-noun" data-word="согуштан" data-trans="from the war / from battle" data-gram="Noun (ablative)" data-pron="so-gush-tan" data-ex-ky="Согуштан кайтты." data-ex-en="He returned from the war.">согуштан</span>
+    <span class="w type-verb" data-word="кайтат" data-trans="will return / comes back" data-gram="Verb (present-future)" data-pron="kay-tat" data-ex-ky="Ал дайыма кайтат." data-ex-en="He always returns.">кайтат</span>
+    деп.
+    Бирок
+    <span class="w type-noun" data-word="каттар" data-trans="the letters" data-gram="Noun (plural)" data-pron="kat-tar" data-ex-ky="Каттар үзүлдү." data-ex-en="The letters stopped.">каттар</span>
+    <span class="w type-verb" data-word="келбей" data-trans="stopped coming / did not come" data-gram="Verb (negative converb)" data-pron="kel-bey" data-ex-ky="Кабар келбей калды." data-ex-en="News stopped arriving.">келбей</span>
+    <span class="w type-verb" data-word="калды" data-trans="remained / had stopped" data-gram="Verb (past completive)" data-pron="kal-dy" data-ex-ky="Ал жалгыз калды." data-ex-en="She was left alone.">калды</span>.
+</p>
+<p>
+    <span class="w type-noun" data-word="Кайгы" data-trans="Grief / sorrow" data-gram="Noun" data-pron="kay-gy" data-ex-ky="Кайгы оор жүк." data-ex-en="Grief is a heavy burden.">Кайгы</span>
+    — ал
+    <span class="w type-verb" data-word="унутулбайт" data-trans="is not forgotten / cannot be forgotten" data-gram="Verb (negative present)" data-pron="u-nu-tul-bayt" data-ex-ky="Кайгы унутулбайт." data-ex-en="Grief is not forgotten.">унутулбайт</span>,
+    бирок
+    <span class="w type-noun" data-word="жер" data-trans="the earth / the land" data-gram="Noun" data-pron="zher" data-ex-ky="Жер — биздин апабыз." data-ex-en="The earth is our mother.">жер</span>
+    ар дайым
+    <span class="w type-adj" data-word="бекем" data-trans="firm, steadfast, enduring" data-gram="Adjective" data-pron="be-kem" data-ex-ky="Жер бекем турат." data-ex-en="The earth stands firm.">бекем</span>
+    <span class="w type-verb" data-word="турат" data-trans="stands / endures / remains" data-gram="Verb (present)" data-pron="tu-rat" data-ex-ky="Ал дайыма турат." data-ex-en="It always endures.">турат</span>.
+</p>`
+    },
+
+    stories: {
+        title: 'First Stories', author: 'Various Kyrgyz Authors',
+        totalPages: 84, currentPage: 38,
+        chapters: ['The Mountain Shepherd','Grandmother\'s Tea','The Market Day','Ala-Too Sunrise','A Letter Home','The New Foal','Village School'],
+        activeChapter: 2,
+        context: {
+            img: 'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=500&q=75',
+            title: 'Kyrgyz Village Life',
+            text: 'These short stories are drawn from everyday life in Kyrgyz ayils — villages. They use simple, high-frequency vocabulary and are written specifically to ease learners into reading authentic Kyrgyz.'
+        },
+        vocab: [
+            {ky:'базар', en:'market / bazaar', type:'noun'},
+            {ky:'сатуучу', en:'seller / vendor', type:'noun'},
+            {ky:'ала-тоо', en:'Ala-Too mountains (spotted peaks)', type:'noun'},
+            {ky:'нан', en:'bread', type:'noun'},
+            {ky:'чоң апа', en:'grandmother', type:'noun'},
+        ],
+        terms: [
+            {word:'Айран', def:'Traditional Kyrgyz fermented milk drink — a staple of daily life and hospitality.', ky:'айран — sour milk drink'},
+            {word:'Дастархан', def:'The spread cloth on which food is served — represents hospitality and family gathering.', ky:'дастархан — table cloth, feast spread'},
+        ],
+        text: `
+<p class="lead">
+    <span class="w type-noun" data-word="Базарда" data-trans="At the market / in the bazaar" data-gram="Noun (locative)" data-pron="ba-zar-da" data-ex-ky="Базарда адам көп." data-ex-en="There are many people at the market.">Базарда</span>
+    ар кандай
+    <span class="w type-noun" data-word="товарлар" data-trans="goods / merchandise" data-gram="Noun (plural)" data-pron="to-var-lar" data-ex-ky="Товарлар кымбат." data-ex-en="The goods are expensive.">товарлар</span>
+    <span class="w type-verb" data-word="сатылат" data-trans="are sold / are for sale" data-gram="Verb (passive present)" data-pron="sa-ty-lat" data-ex-ky="Нан сатылат." data-ex-en="Bread is sold.">сатылат</span>.
+    <span class="w type-noun" data-word="Нан" data-trans="Bread" data-gram="Noun" data-pron="nan" data-ex-ky="Нан жакшы жыттанат." data-ex-en="Bread smells good.">Нан</span>,
+    <span class="w type-noun" data-word="мөмө" data-trans="fruit" data-gram="Noun" data-pron="mö-mö" data-ex-ky="Мөмө таттуу." data-ex-en="Fruit is sweet.">мөмө</span>,
+    <span class="w type-noun" data-word="сүт" data-trans="milk" data-gram="Noun" data-pron="süt" data-ex-ky="Сүт ак." data-ex-en="Milk is white.">сүт</span>.
+</p>
+<p>
+    <span class="w type-noun" data-word="Сатуучу" data-trans="The seller / vendor" data-gram="Noun" data-pron="sa-tuu-chu" data-ex-ky="Сатуучу жакшы адам." data-ex-en="The seller is a good person.">Сатуучу</span>
+    <span class="w type-adj" data-word="кычкыл" data-trans="sour (taste)" data-gram="Adjective" data-pron="kych-kyl" data-ex-ky="Лимон кычкыл." data-ex-en="Lemon is sour.">кычкыл</span>
+    <span class="w type-noun" data-word="алма" data-trans="apple" data-gram="Noun" data-pron="al-ma" data-ex-ky="Алма кызыл." data-ex-en="The apple is red.">алма</span>
+    <span class="w type-verb" data-word="сунду" data-trans="offered / held out / extended" data-gram="Verb (past tense)" data-pron="sun-du" data-ex-ky="Ал колун сунду." data-ex-en="He extended his hand.">сунду</span>.
+    «
+    <span class="w type-adj" data-word="Таттуу" data-trans="Sweet / delicious" data-gram="Adjective" data-pron="tat-tuu" data-ex-ky="Бул таттуу жемиш." data-ex-en="This is a sweet fruit.">Таттуу</span>!» —
+    деп
+    <span class="w type-verb" data-word="жылмайды" data-trans="smiled" data-gram="Verb (past tense)" data-pron="zhyl-may-dy" data-ex-ky="Ал жылмайып турду." data-ex-en="He stood there smiling.">жылмайды</span>.
+</p>
+<p>
+    <span class="w type-noun" data-word="Чоң апа" data-trans="Grandmother" data-gram="Noun" data-pron="chong a-pa" data-ex-ky="Чоң апам мага нан берди." data-ex-en="My grandmother gave me bread.">Чоң апа</span>
+    <span class="w type-noun" data-word="корзинасын" data-trans="her basket (accusative)" data-gram="Noun (accusative, possessive)" data-pron="kor-zi-na-syn" data-ex-ky="Ал корзинасын алды." data-ex-en="She took her basket.">корзинасын</span>
+    <span class="w type-verb" data-word="толтурду" data-trans="filled up / packed full" data-gram="Verb (past tense, causative)" data-pron="tol-tur-du" data-ex-ky="Ал чөйчөктү толтурду." data-ex-en="She filled up the cup.">толтурду</span>
+    жана
+    <span class="w type-adj" data-word="бактылуу" data-trans="happy / content" data-gram="Adjective" data-pron="bak-ty-luu" data-ex-ky="Бактылуу адам — бай адам." data-ex-en="A happy person is a rich person.">бактылуу</span>
+    <span class="w type-verb" data-word="үйгө жөнөдү" data-trans="set off for home / headed home" data-gram="Verb (past tense)" data-pron="üy-gö zhö-nö-dü" data-ex-ky="Ал үйгө жөнөдү." data-ex-en="She headed home.">үйгө жөнөдү</span>.
+</p>`
+    },
+
+    scaffold: {
+        title: 'The Scaffold', author: 'Chyngyz Aitmatov',
+        totalPages: 320, currentPage: 1,
+        chapters: ['The Wolves of Moyunkum','Avdii\'s Search','The Steppe Drug Trade','Boston\'s Herd','Convergence','The Scaffold','Final Reckoning'],
+        activeChapter: 0,
+        context: {
+            img: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=500&q=75',
+            title: 'The Moyunkum Steppe',
+            text: 'The Moyunkum desert in southern Kyrgyzstan and Kazakhstan is the setting for the wolves\' storyline — vast, untamed, a symbol of nature\'s moral clarity against human corruption.'
+        },
+        vocab: [
+            {ky:'бөрү', en:'wolf', type:'noun'},
+            {ky:'талаа', en:'steppe / open land', type:'noun'},
+            {ky:'намыс', en:'honour / conscience', type:'noun'},
+            {ky:'чындык', en:'truth', type:'noun'},
+            {ky:'жаныбар', en:'animal / living creature', type:'noun'},
+        ],
+        terms: [
+            {word:'Манкурт', def:'A person stripped of memory and identity — Aitmatov\'s most powerful symbol of cultural loss and dehumanisation.', ky:'манкурт — slave without memory'},
+            {word:'Ак маңдай', def:'Literally "white forehead" — the she-wolf protagonist, representing natural innocence and maternal love.', ky:'ак — white, маңдай — forehead'},
+        ],
+        text: `
+<p class="lead">
+    <span class="w type-noun" data-word="Бөрүлөр" data-trans="The wolves" data-gram="Noun (plural)" data-pron="bö-rü-lör" data-ex-ky="Бөрүлөр талаада жүрөт." data-ex-en="The wolves roam the steppe.">Бөрүлөр</span>
+    <span class="w type-adj" data-word="жалгыз" data-trans="alone / solitary" data-gram="Adjective" data-pron="zhal-gyz" data-ex-ky="Ал жалгыз жашайт." data-ex-en="It lives alone.">жалгыз</span>
+    <span class="w type-verb" data-word="чуркашты" data-trans="ran / galloped (together)" data-gram="Verb (past, plural)" data-pron="chur-kash-ty" data-ex-ky="Балдар чуркашты." data-ex-en="The children ran.">чуркашты</span> —
+    <span class="w type-adj" data-word="кең" data-trans="wide, vast, open" data-gram="Adjective" data-pron="keng" data-ex-ky="Кең талаа." data-ex-en="The vast steppe.">кең</span>
+    <span class="w type-noun" data-word="Моюнкумда" data-trans="in the Moyunkum (desert)" data-gram="Proper noun (locative)" data-pron="Mo-yun-kum-da" data-ex-ky="Моюнкумда мал жайытталат." data-ex-en="Livestock graze in the Moyunkum.">Моюнкумда</span>
+    алар
+    <span class="w type-adj" data-word="эркин" data-trans="free / unrestrained" data-gram="Adjective" data-pron="er-kin" data-ex-ky="Эркин жашоо жакшы." data-ex-en="A free life is good.">эркин</span>
+    болчу.
+</p>
+<p>
+    <span class="w type-noun" data-word="Ак Маңдай" data-trans="White Forehead (the she-wolf)" data-gram="Proper noun" data-pron="Ak Mang-day" data-ex-ky="Ак Маңдай — аналык сүйүүнүн символу." data-ex-en="Ak Mandai is a symbol of maternal love.">Ак Маңдай</span>
+    <span class="w type-noun" data-word="кучактарын" data-trans="her cubs (accusative)" data-gram="Noun (accusative, plural possessive)" data-pron="ku-chak-ta-ryn" data-ex-ky="Апа балдарын кучактады." data-ex-en="The mother embraced her children.">кучактарын</span>
+    <span class="w type-verb" data-word="коргоду" data-trans="protected / defended" data-gram="Verb (past tense)" data-pron="kor-go-du" data-ex-ky="Ал балдарын коргоду." data-ex-en="She protected her children.">коргоду</span>.
+    Бирок
+    <span class="w type-noun" data-word="адамдар" data-trans="humans / people" data-gram="Noun (plural)" data-pron="a-dam-dar" data-ex-ky="Адамдар жаратылышты бузат." data-ex-en="Humans destroy nature.">адамдар</span>
+    <span class="w type-adj" data-word="ырайымсыз" data-trans="merciless / ruthless" data-gram="Adjective" data-pron="y-ray-ym-syz" data-ex-ky="Ырайымсыз жоо." data-ex-en="A merciless enemy.">ырайымсыз</span>
+    <span class="w type-verb" data-word="болуп чыкты" data-trans="turned out to be / proved to be" data-gram="Verb (past, resultative)" data-pron="bo-lup chyk-ty" data-ex-ky="Ал жакшы адам болуп чыкты." data-ex-en="He turned out to be a good person.">болуп чыкты</span>.
+</p>
+<p>
+    <span class="w type-noun" data-word="Чындык" data-trans="Truth / reality" data-gram="Noun" data-pron="chyn-dyk" data-ex-ky="Чындык ачыкталат." data-ex-en="Truth will be revealed.">Чындык</span>
+    —
+    <span class="w type-adj" data-word="оор" data-trans="heavy / difficult / hard" data-gram="Adjective" data-pron="oor" data-ex-ky="Оор жүк." data-ex-en="A heavy burden.">оор</span>
+    <span class="w type-noun" data-word="жүк" data-trans="burden / load" data-gram="Noun" data-pron="zhük" data-ex-ky="Жүктү алып жүр." data-ex-en="Carry the load.">жүк</span>,
+    бирок
+    <span class="w type-noun" data-word="жаныбарлар" data-trans="animals / creatures" data-gram="Noun (plural)" data-pron="zha-ny-bar-lar" data-ex-ky="Жаныбарлар табиятта жашайт." data-ex-en="Animals live in nature.">жаныбарлар</span>
+    аны
+    <span class="w type-adj" data-word="жакшы" data-trans="well / better" data-gram="Adjective / Adverb" data-pron="zhak-shy" data-ex-ky="Жаныбарлар жакшы билет." data-ex-en="Animals understand it better.">жакшы</span>
+    <span class="w type-verb" data-word="билишет" data-trans="know / understand (plural)" data-gram="Verb (present, plural)" data-pron="bi-li-shet" data-ex-ky="Алар билишет." data-ex-en="They know.">билишет</span>
+    <span class="w type-noun" data-word="окшойт" data-trans="it seems / apparently" data-gram="Verb (evidential)" data-pron="ok-shoyt" data-ex-ky="Туура окшойт." data-ex-en="It seems correct.">окшойт</span>.
+</p>`
+    }
+};
+
+/* ────────────────────────────────────────────────
+   STATE
+──────────────────────────────────────────────── */
+let currentBook = null;
+let playing = false;
+let audioInterval = null;
+let playedBars = 16;
+let fontSize = 1.05;
+let ttTimeout = null;
+
+/* ────────────────────────────────────────────────
+   FILTER
+──────────────────────────────────────────────── */
+function filterBooks(btn, filter) {
+    document.querySelectorAll('.fchip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.book-card').forEach(card => {
+        if (filter === 'all') { card.style.display = ''; return; }
+        card.style.display = (card.dataset.level === filter || card.dataset.genre === filter) ? '' : 'none';
+    });
+}
+
+/* ────────────────────────────────────────────────
+   OPEN / CLOSE READER
+──────────────────────────────────────────────── */
+function openReader(id) {
+    const b = BOOKS[id];
+    if (!b) return;
+    currentBook = b;
+
+    document.getElementById('rtTitle').textContent = b.title;
+    document.getElementById('rtAuthor').textContent = b.author;
+    document.getElementById('audioChapter').textContent = 'Kyrgyz Original · Chapter ' + (b.activeChapter + 1);
+    updateProgress(b.currentPage, b.totalPages);
+
+    buildChapterNav(b);
+    buildVocab(b.vocab);
+    buildTerms(b.terms);
+    buildContext(b.context);
+
+    const rt = document.getElementById('readingText');
+    rt.innerHTML = `
+        <div class="word-legend">
+            <div class="leg-item"><div class="leg-dot" style="background:#DC2626"></div> Verb</div>
+            <div class="leg-item"><div class="leg-dot" style="background:#2563EB"></div> Noun</div>
+            <div class="leg-item"><div class="leg-dot" style="background:#7C3AED"></div> Adjective</div>
+            <div class="leg-hint">Tap any word to translate →</div>
+        </div>
+        ${b.text}
+        <div class="reader-footer">
+            <span class="page-indicator" id="pageIndicator">PAGE ${b.currentPage} OF ${b.totalPages}</span>
+            <div class="page-controls">
+                <button class="page-btn" id="prevBtn" onclick="changePage(-1)">‹</button>
+                <button class="page-btn" onclick="changePage(1)">›</button>
+            </div>
+        </div>`;
+
+    attachWordListeners();
+    buildWaveform();
+    document.getElementById('readerModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+    updateProgress(b.currentPage, b.totalPages);
+}
+
+function closeReader() {
+    document.getElementById('readerModal').classList.remove('active');
+    document.body.style.overflow = '';
+    hideTooltip();
+    if (playing) togglePlay();
+}
+
+function updateProgress(page, total) {
+    const pct = ((page / total) * 100).toFixed(1);
+    document.getElementById('rtProgFill').style.width = pct + '%';
+    document.getElementById('rtProgLbl').textContent = `Page ${page} of ${total}`;
+    const pi = document.getElementById('pageIndicator');
+    if (pi) pi.textContent = `PAGE ${page} OF ${total}`;
+    const pb = document.getElementById('prevBtn');
+    if (pb) pb.disabled = page <= 1;
+}
+
+function changePage(dir) {
+    if (!currentBook) return;
+    currentBook.currentPage = Math.max(1, Math.min(currentBook.totalPages, currentBook.currentPage + dir));
+    updateProgress(currentBook.currentPage, currentBook.totalPages);
+}
+
+/* ────────────────────────────────────────────────
+   CHAPTER NAV
+──────────────────────────────────────────────── */
+function buildChapterNav(b) {
+    const nav = document.getElementById('chapterNav');
+    nav.innerHTML = '<div class="cn-label">Chapters</div>';
+    b.chapters.forEach((ch, i) => {
+        const el = document.createElement('div');
+        el.className = 'ch-item' + (i === b.activeChapter ? ' active' : '');
+        el.innerHTML = `<span class="ch-num">${toRoman(i+1)}</span><span class="ch-name">${ch}</span><span class="ch-dot"></span>`;
+        el.onclick = () => {
+            document.querySelectorAll('.ch-item').forEach(x => x.classList.remove('active'));
+            el.classList.add('active');
+            b.activeChapter = i;
+        };
+        nav.appendChild(el);
+    });
+}
+
+function toRoman(n) {
+    const r = ['I','II','III','IV','V','VI','VII','VIII','IX','X'];
+    return r[n-1] || n;
+}
+
+/* ────────────────────────────────────────────────
+   SIDEBAR BUILDERS
+──────────────────────────────────────────────── */
+function buildVocab(vocab) {
+    const list = document.getElementById('vocabList');
+    list.innerHTML = '';
+    vocab.forEach(v => {
+        const div = document.createElement('div');
+        div.className = 'vocab-item';
+        const typeClass = {verb:'vbv', noun:'vbn', adj:'vba'}[v.type] || 'vbn';
+        div.innerHTML = `<div><div class="vocab-word">${v.ky}</div><div class="vocab-mean">${v.en}</div></div>
+                         <span class="vbadge ${typeClass}">${v.type}</span>`;
+        list.appendChild(div);
+    });
+}
+
+function buildTerms(terms) {
+    const list = document.getElementById('ktermList');
+    list.innerHTML = '';
+    terms.forEach(t => {
+        const div = document.createElement('div');
+        div.className = 'kterm';
+        div.innerHTML = `<div class="kterm-word">${t.word}</div><div class="kterm-def">${t.def}</div><div class="kterm-ky">${t.ky}</div>`;
+        list.appendChild(div);
+    });
+}
+
+function buildContext(ctx) {
+    document.getElementById('ctxImg').src = ctx.img;
+    document.getElementById('ctxTitle').textContent = ctx.title;
+    document.getElementById('ctxText').textContent = ctx.text;
+}
+
+/* ────────────────────────────────────────────────
+   WORD TOOLTIP
+──────────────────────────────────────────────── */
+function attachWordListeners() {
+    document.querySelectorAll('#readingText .w').forEach(el => {
+        el.addEventListener('click', function(e) {
+            e.stopPropagation();
+            showTooltip(e, this.dataset);
+        });
+    });
+}
+
+function showTooltip(e, d) {
+    clearTimeout(ttTimeout);
+    document.getElementById('ttWord').textContent = d.word;
+    document.getElementById('ttTrans').textContent = d.trans;
+    document.getElementById('ttPron').textContent = '/' + d.pron + '/';
+    document.getElementById('ttExKy').textContent = d.exKy;
+    document.getElementById('ttExEn').textContent = d.exEn;
+
+    const typeEl = document.getElementById('ttType');
+    typeEl.textContent = d.gram;
+    const gl = d.gram.toLowerCase();
+    if (gl.includes('verb'))  { typeEl.style.background='#FEF2F2'; typeEl.style.color='#DC2626'; }
+    else if (gl.includes('noun') || gl.includes('proper')) { typeEl.style.background='#EFF6FF'; typeEl.style.color='#2563EB'; }
+    else { typeEl.style.background='#F5F3FF'; typeEl.style.color='#7C3AED'; }
+
+    const tt = document.getElementById('wordTooltip');
+    const rect = e.target.getBoundingClientRect();
+    let left = rect.left - 20;
+    let top  = rect.top + window.scrollY - 248;
+    tt.style.left = Math.max(8, Math.min(left, window.innerWidth - 288)) + 'px';
+    tt.style.top  = Math.max(8, top) + 'px';
+    tt.classList.add('show');
+    ttTimeout = setTimeout(hideTooltip, 6000);
+}
+
+function hideTooltip() { document.getElementById('wordTooltip').classList.remove('show'); }
+
+function addFlashcard() {
+    const word = document.getElementById('ttWord').textContent;
+    hideTooltip();
+    const toast = document.createElement('div');
+    toast.textContent = `"${word}" added to flashcards ✓`;
+    Object.assign(toast.style, {
+        position:'fixed', bottom:'24px', left:'50%', transform:'translateX(-50%)',
+        background:'#0F172A', color:'white', padding:'.6rem 1.2rem',
+        borderRadius:'99px', fontSize:'.8rem', fontWeight:'600',
+        zIndex:'99999', boxShadow:'0 4px 16px rgba(0,0,0,.18)'
+    });
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2200);
+}
+
+document.addEventListener('click', hideTooltip);
+
+/* ────────────────────────────────────────────────
+   AUDIO
+──────────────────────────────────────────────── */
+function buildWaveform() {
+    const wf = document.getElementById('waveform');
+    wf.innerHTML = '';
+    playedBars = 16;
+    for (let i = 0; i < 48; i++) {
+        const bar = document.createElement('div');
+        bar.className = 'wv-bar' + (i < playedBars ? ' played' : '');
+        const h = Math.max(4, 18 + Math.sin(i * 0.65) * 9 + Math.random() * 14);
+        bar.style.height = h + 'px';
+        bar.onclick = () => {
+            document.querySelectorAll('.wv-bar').forEach((b,j) => b.classList.toggle('played', j <= i));
+            playedBars = i + 1;
+        };
+        wf.appendChild(bar);
+    }
+}
+
+function togglePlay() {
+    const btn = document.getElementById('playBtn');
+    playing = !playing;
+    btn.textContent = playing ? '⏸' : '▶';
+    if (playing) {
+        audioInterval = setInterval(() => {
+            const bars = document.querySelectorAll('.wv-bar');
+            if (playedBars < bars.length) {
+                bars[playedBars].classList.add('played');
+                playedBars++;
+                const secs = Math.floor((playedBars / bars.length) * 510);
+                document.getElementById('audioTime').textContent =
+                    `${Math.floor(secs/60)}:${String(secs%60).padStart(2,'0')}`;
+            } else {
+                clearInterval(audioInterval); playing = false; btn.textContent = '▶';
+            }
+        }, 200);
+    } else { clearInterval(audioInterval); }
+}
+
+/* ────────────────────────────────────────────────
+   PANELS
+──────────────────────────────────────────────── */
+function togglePanel(name) {
+    const body = document.getElementById(name+'-body');
+    const tog  = document.getElementById(name+'-toggle');
+    const col  = body.classList.toggle('collapsed');
+    tog.textContent = col ? '▸' : '▾';
+}
+
+/* ────────────────────────────────────────────────
+   MISC
+──────────────────────────────────────────────── */
+function toggleHighlight(btn) { btn.classList.toggle('active'); }
+
+function changeFontSize() {
+    fontSize = fontSize===1.05 ? 1.15 : fontSize===1.15 ? 1.25 : 1.05;
+    document.querySelectorAll('#readingText p').forEach(p => p.style.fontSize = fontSize + 'rem');
+}
+
+/* Close on backdrop */
+document.getElementById('readerModal').addEventListener('click', e => {
+    if (e.target === document.getElementById('readerModal')) closeReader();
+});
+
+/* Keyboard */
+document.addEventListener('keydown', e => {
+    if (!document.getElementById('readerModal').classList.contains('active')) return;
+    if (e.key === 'Escape') closeReader();
+    if (e.key === 'ArrowRight') changePage(1);
+    if (e.key === 'ArrowLeft')  changePage(-1);
+    if (e.key === ' ') { e.preventDefault(); togglePlay(); }
+});
+</script>
+{% endblock %}

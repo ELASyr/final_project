@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tilbil — Learn Kyrgyz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+    --ink:#0A0A0F;
+    --ink-2:#1C1C26;
+    --slate:#5C6070;
+    --muted:#9298A8;
+    --line:#E4E6ED;
+    --bg:#F7F8FA;
+    --white:#FFFFFF;
+    --indigo:#4F46E5;
+    --indigo-dark:#3730A3;
+    --indigo-pale:#EEF2FF;
+}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:'Inter',sans-serif;color:var(--ink);background:var(--white);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+button{font-family:'Inter',sans-serif;cursor:pointer;border:none;background:none}
+img{display:block}
+
+/* ── NAV ─────────────────────────────────────── */
+.nav{
+    position:fixed;top:0;left:0;right:0;z-index:200;
+    height:58px;display:flex;align-items:center;justify-content:space-between;
+    padding:0 2.5rem;
+    background:rgba(255,255,255,0.88);
+    backdrop-filter:blur(16px);
+    border-bottom:1px solid rgba(228,230,237,0.7);
+}
+.nav-brand{
+    font-size:.96rem;font-weight:700;letter-spacing:-.02em;color:var(--ink);
+    display:flex;align-items:center;gap:8px;
+}
+.nav-logo{
+    width:28px;height:28px;background:var(--indigo);border-radius:7px;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.nav-links{display:flex;align-items:center;gap:.1rem}
+.nav-link{
+    padding:5px 13px;border-radius:7px;
+    font-size:.84rem;font-weight:500;color:var(--slate);transition:all .15s;
+}
+.nav-link:hover{color:var(--ink);background:var(--bg)}
+.nav-right{display:flex;align-items:center;gap:.6rem}
+.btn-ghost{
+    padding:7px 16px;border-radius:7px;
+    font-size:.84rem;font-weight:500;color:var(--ink);
+    border:1px solid var(--line);background:var(--white);transition:all .15s;
+}
+.btn-ghost:hover{border-color:var(--indigo);color:var(--indigo)}
+.btn-solid{
+    padding:8px 18px;border-radius:7px;
+    font-size:.84rem;font-weight:600;color:white;background:var(--ink);
+    transition:all .15s;
+}
+.btn-solid:hover{background:var(--indigo)}
+
+/* ── HERO ────────────────────────────────────── */
+.hero{
+    min-height:100vh;position:relative;
+    display:flex;align-items:flex-end;
+    overflow:hidden;
+}
+.hero-bg{
+    position:absolute;inset:0;
+    background:url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1800&q=85') center 40%/cover no-repeat;
+}
+.hero-overlay{
+    position:absolute;inset:0;
+    background:linear-gradient(
+        105deg,
+        rgba(10,10,15,.82) 0%,
+        rgba(10,10,15,.65) 42%,
+        rgba(10,10,15,.18) 100%
+    );
+}
+.hero-body{
+    position:relative;z-index:2;
+    max-width:1160px;width:100%;margin:0 auto;
+    padding:0 2.5rem 6rem;
+    display:grid;grid-template-columns:1fr 1fr;
+    align-items:flex-end;gap:4rem;
+}
+.hero-left{}
+.hero-kicker{
+    display:inline-flex;align-items:center;gap:7px;
+    border:1px solid rgba(255,255,255,.18);border-radius:99px;
+    padding:4px 13px;margin-bottom:1.6rem;
+    font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+    color:rgba(255,255,255,.65);
+}
+.kicker-dot{width:5px;height:5px;border-radius:50%;background:#4ADE80;flex-shrink:0}
+.hero-h1{
+    font-family:'DM Serif Display',serif;
+    font-size:clamp(2.8rem,5.5vw,4.2rem);
+    line-height:1.08;color:white;
+    letter-spacing:-.02em;margin-bottom:1.3rem;
+}
+.hero-h1 em{font-style:italic;color:#C7D2FE}
+.hero-p{
+    font-size:.95rem;color:rgba(255,255,255,.52);
+    line-height:1.75;max-width:420px;margin-bottom:2.2rem;font-weight:400;
+}
+.hero-actions{display:flex;gap:.65rem;align-items:center}
+.btn-hero-primary{
+    padding:12px 26px;border-radius:8px;
+    font-size:.9rem;font-weight:600;color:white;
+    background:var(--indigo);transition:all .2s;
+    border:1px solid transparent;
+}
+.btn-hero-primary:hover{background:var(--indigo-dark);transform:translateY(-1px)}
+.btn-hero-ghost{
+    padding:12px 22px;border-radius:8px;
+    font-size:.9rem;font-weight:500;
+    color:rgba(255,255,255,.7);
+    border:1px solid rgba(255,255,255,.2);
+    transition:all .15s;background:rgba(255,255,255,.06);
+}
+.btn-hero-ghost:hover{border-color:rgba(255,255,255,.45);color:white}
+
+/* hero right — word card */
+.hero-right{display:flex;justify-content:flex-end;align-items:flex-end;padding-bottom:.25rem}
+.word-card{
+    background:rgba(255,255,255,.95);backdrop-filter:blur(16px);
+    border-radius:14px;padding:1.5rem 1.6rem;width:280px;
+    border:1px solid rgba(255,255,255,.4);
+}
+.wc-label{
+    font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);margin-bottom:.7rem;
+}
+.wc-kyrgyz{
+    font-family:'DM Serif Display',serif;
+    font-size:2.2rem;color:var(--ink);line-height:1;margin-bottom:.2rem;
+}
+.wc-english{font-size:.82rem;color:var(--indigo);font-weight:600;margin-bottom:1.1rem}
+.wc-divider{height:1px;background:var(--line);margin-bottom:1.1rem}
+.wc-stats{display:flex;gap:1.1rem}
+.wc-stat{}
+.wc-stat-n{font-size:1.2rem;font-weight:700;color:var(--ink);line-height:1;margin-bottom:2px}
+.wc-stat-l{font-size:.65rem;color:var(--muted);font-weight:500}
+
+/* ── STATS BAR ───────────────────────────────── */
+.stats-bar{
+    background:var(--white);border-bottom:1px solid var(--line);
+    padding:1.4rem 2.5rem;
+    display:flex;align-items:center;justify-content:center;gap:5rem;
+}
+.sb-item{text-align:center}
+.sb-num{font-size:1.5rem;font-weight:700;color:var(--ink);letter-spacing:-.03em;line-height:1;margin-bottom:3px}
+.sb-label{font-size:.72rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+
+/* ── FEATURES ────────────────────────────────── */
+.features{background:var(--white);padding:6rem 2.5rem}
+.section-inner{max-width:1100px;margin:0 auto}
+.section-kicker{
+    font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--indigo);margin-bottom:.65rem;display:block;
+}
+.section-h2{
+    font-family:'DM Serif Display',serif;
+    font-size:clamp(2rem,3.5vw,2.75rem);
+    color:var(--ink);line-height:1.18;letter-spacing:-.015em;margin-bottom:.75rem;
+}
+.section-h2 em{font-style:italic}
+.section-sub{font-size:.9rem;color:var(--slate);line-height:1.7;max-width:500px;margin-bottom:3.5rem}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.feat-card{
+    background:var(--white);padding:2rem 1.75rem;transition:background .15s;
+}
+.feat-card:hover{background:var(--bg)}
+.feat-icon-box{
+    width:38px;height:38px;border-radius:9px;
+    display:flex;align-items:center;justify-content:center;
+    margin-bottom:1.1rem;
+}
+.fi-indigo{background:var(--indigo-pale)}
+.fi-dark  {background:#F3F4F6}
+.feat-name{font-size:.88rem;font-weight:700;color:var(--ink);margin-bottom:.35rem;letter-spacing:-.01em}
+.feat-desc{font-size:.78rem;color:var(--slate);line-height:1.65}
+
+/* ── HOW ─────────────────────────────────────── */
+.how{background:var(--bg);padding:6rem 2.5rem}
+.how-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center}
+.how-steps{display:flex;flex-direction:column;gap:0}
+.how-step{
+    display:flex;gap:1.1rem;padding:1.4rem 0;
+    border-bottom:1px solid var(--line);
+}
+.how-step:last-child{border-bottom:none}
+.hs-num{
+    width:28px;height:28px;border-radius:6px;background:var(--ink);
+    color:white;font-size:.72rem;font-weight:700;
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;margin-top:1px;
+}
+.hs-title{font-size:.88rem;font-weight:700;color:var(--ink);margin-bottom:.22rem}
+.hs-desc{font-size:.78rem;color:var(--slate);line-height:1.65}
+
+/* lesson card mock */
+.lesson-mock{background:var(--white);border-radius:14px;border:1px solid var(--line);overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.06)}
+.lm-bar-wrap{background:var(--ink);padding:.85rem 1.25rem;display:flex;align-items:center;justify-content:space-between}
+.lm-bar-title{font-size:.72rem;font-weight:500;color:rgba(255,255,255,.5);letter-spacing:.02em}
+.lm-prog{display:flex;align-items:center;gap:8px}
+.lm-prog-bar{width:68px;height:3px;background:rgba(255,255,255,.15);border-radius:99px;overflow:hidden}
+.lm-prog-fill{height:100%;width:60%;background:rgba(255,255,255,.6);border-radius:99px}
+.lm-prog-pct{font-size:.65rem;color:rgba(255,255,255,.4);font-weight:500}
+.lm-body{padding:1.75rem 1.4rem}
+.lm-prompt{font-size:.62rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;margin-bottom:.55rem}
+.lm-word{font-family:'DM Serif Display',serif;font-size:2.8rem;color:var(--ink);margin-bottom:.2rem;line-height:1}
+.lm-hint{font-size:.78rem;color:var(--slate);margin-bottom:1.4rem}
+.lm-choices{display:grid;grid-template-columns:1fr 1fr;gap:.45rem}
+.lm-choice{
+    padding:10px 12px;border-radius:8px;
+    border:1.5px solid var(--line);font-size:.8rem;font-weight:500;
+    color:var(--ink);text-align:center;transition:all .15s;
+}
+.lm-choice.sel{background:var(--indigo-pale);border-color:var(--indigo);color:var(--indigo)}
+
+/* ── LITERATURE STRIP ────────────────────────── */
+.lit{background:var(--ink);padding:6rem 2.5rem}
+.lit-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center}
+.lit-text .section-kicker{color:#A5B4FC}
+.lit-h2{
+    font-family:'DM Serif Display',serif;
+    font-size:clamp(1.9rem,3.2vw,2.6rem);
+    color:white;line-height:1.2;letter-spacing:-.015em;margin-bottom:.85rem;
+}
+.lit-h2 em{font-style:italic;color:#FDE68A}
+.lit-p{font-size:.88rem;color:rgba(255,255,255,.45);line-height:1.8;margin-bottom:1.6rem}
+.lit-chips{display:flex;flex-wrap:wrap;gap:.4rem}
+.lit-chip{
+    padding:4px 12px;border-radius:99px;
+    border:1px solid rgba(255,255,255,.1);
+    font-size:.72rem;color:rgba(255,255,255,.45);
+}
+.book-grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+.book-card{
+    border-radius:11px;overflow:hidden;
+    border:1px solid rgba(255,255,255,.07);
+    transition:transform .2s,border-color .2s;
+}
+.book-card:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.14)}
+.book-cover{
+    height:130px;display:flex;flex-direction:column;
+    justify-content:space-between;padding:.9rem;position:relative;overflow:hidden;
+}
+/* unique gradient per book */
+.bc-white-ship{background:url('/static/uploads/book-white-ship.jpg') center/cover no-repeat}
+.bc-manas     {background:url('/static/uploads/book-manas.jpg') center/cover no-repeat}
+.bc-mothers   {background:url('/static/uploads/book-mothers-field.jpg') center/cover no-repeat}
+.bc-jamila    {background:url('/static/uploads/book-jamila.jpg') center/cover no-repeat}
+/* subtle noise texture overlay */
+.book-cover::before{
+    content:'';position:absolute;inset:0;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+    background-size:200px;pointer-events:none;opacity:.5;
+}
+/* top accent line */
+.book-cover::after{
+    content:'';position:absolute;top:0;left:0;right:0;height:2px;
+    background:linear-gradient(90deg,rgba(255,255,255,.25),rgba(255,255,255,.04));
+}
+.book-cover-top{position:relative;z-index:1}
+.book-genre{
+    font-size:.58rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+    color:rgba(255,255,255,.35);
+}
+.book-cover-bottom{position:relative;z-index:1}
+.book-t{font-size:.78rem;font-weight:700;color:white;line-height:1.3;margin-bottom:2px}
+.book-a{font-size:.63rem;color:rgba(255,255,255,.4)}
+
+/* ── BOTTOM CTA ──────────────────────────────── */
+.cta-section{padding:6rem 2.5rem;background:var(--white)}
+.cta-box{
+    max-width:720px;margin:0 auto;text-align:center;
+}
+.cta-h2{
+    font-family:'DM Serif Display',serif;
+    font-size:clamp(2rem,3.8vw,3rem);
+    color:var(--ink);letter-spacing:-.02em;line-height:1.15;margin-bottom:.85rem;
+}
+.cta-h2 em{font-style:italic;color:var(--indigo)}
+.cta-p{font-size:.9rem;color:var(--slate);line-height:1.75;margin-bottom:2rem}
+.cta-btns{display:flex;gap:.65rem;justify-content:center;flex-wrap:wrap}
+.btn-cta-main{
+    padding:13px 32px;border-radius:8px;
+    font-size:.92rem;font-weight:600;color:white;
+    background:var(--ink);transition:all .15s;
+}
+.btn-cta-main:hover{background:var(--indigo)}
+.btn-cta-outline{
+    padding:13px 26px;border-radius:8px;
+    font-size:.92rem;font-weight:500;color:var(--ink);
+    border:1.5px solid var(--line);transition:all .15s;
+}
+.btn-cta-outline:hover{border-color:var(--indigo);color:var(--indigo)}
+
+/* ── FOOTER ──────────────────────────────────── */
+.footer{
+    border-top:1px solid var(--line);
+    padding:1.4rem 2.5rem;
+    display:flex;align-items:center;justify-content:space-between;
+    background:var(--white);
+}
+.footer-brand{font-size:.9rem;font-weight:700;color:var(--ink);letter-spacing:-.02em}
+.footer-copy{font-size:.74rem;color:var(--muted)}
+.footer-links{display:flex;gap:1.4rem}
+.footer-link{font-size:.78rem;color:var(--slate);font-weight:500;transition:color .15s}
+.footer-link:hover{color:var(--indigo)}
+
+/* ── FADE ANIMATION ──────────────────────────── */
+.fade{opacity:0;transform:translateY(20px);transition:opacity .55s ease,transform .55s ease}
+.fade.in{opacity:1;transform:translateY(0)}
+
+@media(max-width:1024px){
+    .hero-body{grid-template-columns:1fr;padding-bottom:4rem;gap:2.5rem}
+    .hero-right{justify-content:flex-start}
+    .how-grid,.lit-inner{grid-template-columns:1fr}
+}
+@media(max-width:768px){
+    .nav{padding:0 1.25rem}.nav-links{display:none}
+    .feat-grid{grid-template-columns:1fr 1fr}
+    .stats-bar{gap:2.5rem;flex-wrap:wrap}
+    .footer{flex-direction:column;gap:.75rem;text-align:center}
+    .hero-body{padding:0 1.25rem 3.5rem}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+    <a href="{{ url_for('index') }}" class="nav-brand">
+        <div class="nav-logo">
+            <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+                <path d="M3 17L10 3L17 17" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M6 12H14" stroke="white" stroke-width="2.4" stroke-linecap="round"/>
+            </svg>
+        </div>
+        Tilbil
+    </a>
+    <div class="nav-links">
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#how" class="nav-link">How it works</a>
+        <a href="#literature" class="nav-link">Literature</a>
+    </div>
+    <div class="nav-right">
+        <a href="{{ url_for('login') }}"><button class="btn-ghost">Sign in</button></a>
+        <a href="{{ url_for('register') }}"><button class="btn-solid">Get started</button></a>
+    </div>
+</nav>
+
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-body">
+        <div class="hero-left">
+            <div class="hero-kicker">
+                <div class="kicker-dot"></div>
+                Kyrgyz language platform
+            </div>
+            <h1 class="hero-h1">
+                Learn Kyrgyz<br>
+                the way it was<br>
+                <em>meant to be.</em>
+            </h1>
+            <p class="hero-p">Vocabulary, literature, games and cultural context — built for people who want more than a phrasebook.</p>
+            <div class="hero-actions">
+                <a href="{{ url_for('register') }}"><button class="btn-hero-primary">Start for free →</button></a>
+                <a href="#how"><button class="btn-hero-ghost">See how it works</button></a>
+            </div>
+        </div>
+        <div class="hero-right">
+            <div class="word-card">
+                <div class="wc-label">Word of the day</div>
+                <div class="wc-kyrgyz">Тоо</div>
+                <div class="wc-english">Mountain</div>
+                <div class="wc-divider"></div>
+                <div class="wc-stats">
+                    <div class="wc-stat">
+                        <div class="wc-stat-n">500+</div>
+                        <div class="wc-stat-l">Words</div>
+                    </div>
+                    <div class="wc-stat">
+                        <div class="wc-stat-n">3</div>
+                        <div class="wc-stat-l">Levels</div>
+                    </div>
+                    <div class="wc-stat">
+                        <div class="wc-stat-n">4</div>
+                        <div class="wc-stat-l">Games</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+    <div class="sb-item"><div class="sb-num">500+</div><div class="sb-label">Kyrgyz words</div></div>
+    <div class="sb-item"><div class="sb-num">4</div><div class="sb-label">Interactive games</div></div>
+    <div class="sb-item"><div class="sb-num">3</div><div class="sb-label">Skill levels</div></div>
+    <div class="sb-item"><div class="sb-num">100%</div><div class="sb-label">Free to start</div></div>
+</div>
+
+
+<!-- FEATURES -->
+<div class="features" id="features">
+    <div class="section-inner">
+        <div class="fade">
+            <span class="section-kicker">Platform features</span>
+            <h2 class="section-h2">Everything you need<br>to learn Kyrgyz.</h2>
+        </div>
+        <div class="feat-grid fade">
+
+            <div class="feat-card">
+                <div class="feat-icon-box fi-indigo">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                        <circle cx="9" cy="9" r="7" stroke="#4F46E5" stroke-width="1.5"/>
+                        <path d="M6.5 9l2 2 3-3" stroke="#4F46E5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="feat-name">Structured path</div>
+                <div class="feat-desc">Beginner to Advanced modules with grammar, vocabulary, and cultural context at every level.</div>
+            </div>
+
+            <div class="feat-card">
+                <div class="feat-icon-box fi-indigo">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                        <rect x="2" y="2" width="14" height="14" rx="3" stroke="#4F46E5" stroke-width="1.5"/>
+                        <path d="M6 9h6M9 6v6" stroke="#4F46E5" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="feat-name">Interactive games</div>
+                <div class="feat-desc">Vocabulary Race, Picture Matching, Word Builder — reinforce words through play, not rote repetition.</div>
+            </div>
+
+            <div class="feat-card">
+                <div class="feat-icon-box fi-dark">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                        <path d="M3 4h12v8a2 2 0 01-2 2H5a2 2 0 01-2-2V4z" stroke="#374151" stroke-width="1.5" stroke-linejoin="round"/>
+                        <path d="M6 8h6M6 11h3" stroke="#374151" stroke-width="1.4" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="feat-name">Classic literature</div>
+                <div class="feat-desc">Read Chyngyz Aitmatov and the Epic of Manas with inline word translations and cultural notes.</div>
+            </div>
+
+            <div class="feat-card">
+                <div class="feat-icon-box fi-dark">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                        <circle cx="9" cy="9" r="7" stroke="#374151" stroke-width="1.5"/>
+                        <path d="M9 2C7.5 4 6.5 6 6.5 9s1 5 2.5 7M9 2c1.5 2 2.5 4 2.5 7s-1 5-2.5 7M2 9h14" stroke="#374151" stroke-width="1.3" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="feat-name">Dialect translator</div>
+                <div class="feat-desc">Translate between Standard Kyrgyz and regional dialects — Talas, Issyk-Kul, Naryn, Chui, South.</div>
+            </div>
+
+            <div class="feat-card">
+                <div class="feat-icon-box fi-indigo">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                        <path d="M2 13l3.5-3.5 3 3 3.5-4 4 4.5" stroke="#4F46E5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="feat-name">Progress tracking</div>
+                <div class="feat-desc">Day streaks, leaderboards, mastery levels and XP — see your growth in real time.</div>
+            </div>
+
+            <div class="feat-card">
+                <div class="feat-icon-box fi-dark">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                        <circle cx="9" cy="7" r="3.5" stroke="#374151" stroke-width="1.5"/>
+                        <path d="M3 16c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="#374151" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="feat-name">Personal account</div>
+                <div class="feat-desc">Save your progress, customise your profile and pick your learning goal. Your journey, your pace.</div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- HOW IT WORKS -->
+<div class="how" id="how">
+    <div class="section-inner">
+        <div class="fade">
+            <span class="section-kicker">Simple process</span>
+            <h2 class="section-h2">Three steps to<br><em>fluency.</em></h2>
+        </div>
+        <div class="how-grid fade">
+            <div class="how-steps">
+                <div class="how-step">
+                    <div class="hs-num">1</div>
+                    <div>
+                        <div class="hs-title">Create your account</div>
+                        <div class="hs-desc">Sign up in 30 seconds. Set your native language and learning goal to personalise your path.</div>
+                    </div>
+                </div>
+                <div class="how-step">
+                    <div class="hs-num">2</div>
+                    <div>
+                        <div class="hs-title">Follow the learning path</div>
+                        <div class="hs-desc">Work through structured modules at your own pace — grammar, vocabulary, and culture in one place.</div>
+                    </div>
+                </div>
+                <div class="how-step">
+                    <div class="hs-num">3</div>
+                    <div>
+                        <div class="hs-title">Play, read, compete</div>
+                        <div class="hs-desc">Strengthen vocabulary through games, read Kyrgyz literature, and climb the leaderboard.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="lesson-mock">
+                <div class="lm-bar-wrap">
+                    <span class="lm-bar-title">Lesson 4 · Vocabulary</span>
+                    <div class="lm-prog">
+                        <div class="lm-prog-bar"><div class="lm-prog-fill"></div></div>
+                        <span class="lm-prog-pct">6 / 10</span>
+                    </div>
+                </div>
+                <div class="lm-body">
+                    <div class="lm-prompt">Translate this word</div>
+                    <div class="lm-word">Жылга</div>
+                    <div class="lm-hint">What does this Kyrgyz word mean?</div>
+                    <div class="lm-choices">
+                        <div class="lm-choice sel">River valley</div>
+                        <div class="lm-choice">Mountain pass</div>
+                        <div class="lm-choice">Steppe</div>
+                        <div class="lm-choice">Glacier</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- LITERATURE -->
+<div class="lit" id="literature">
+    <div class="lit-inner">
+        <div class="lit-text fade">
+            <span class="section-kicker">Kyrgyz culture</span>
+            <h2 class="lit-h2">Language is more<br>than <em>words.</em></h2>
+            <p class="lit-p">Read masterpieces by Chyngyz Aitmatov, explore the Epic of Manas, and discover the culture behind the language — with interactive translations at every step.</p>
+            <div class="lit-chips">
+                <div class="lit-chip">Epic of Manas</div>
+                <div class="lit-chip">Chyngyz Aitmatov</div>
+                <div class="lit-chip">Folklore</div>
+                <div class="lit-chip">Nomadic heritage</div>
+            </div>
+        </div>
+        <div class="book-grid fade">
+            <div class="book-card">
+                <div class="book-cover bc-white-ship">
+                    <div class="book-cover-top"><span class="book-genre">Novel · Advanced</span></div>
+                    <div class="book-cover-bottom">
+                        <div class="book-t">The White Ship</div>
+                        <div class="book-a">Chyngyz Aitmatov</div>
+                    </div>
+                </div>
+            </div>
+            <div class="book-card">
+                <div class="book-cover bc-manas">
+                    <div class="book-cover-top"><span class="book-genre">Epic · Advanced</span></div>
+                    <div class="book-cover-bottom">
+                        <div class="book-t">Epic of Manas</div>
+                        <div class="book-a">Kyrgyz oral tradition</div>
+                    </div>
+                </div>
+            </div>
+            <div class="book-card">
+                <div class="book-cover bc-mothers">
+                    <div class="book-cover-top"><span class="book-genre">Novel · Intermediate</span></div>
+                    <div class="book-cover-bottom">
+                        <div class="book-t">Mother's Field</div>
+                        <div class="book-a">Chyngyz Aitmatov</div>
+                    </div>
+                </div>
+            </div>
+            <div class="book-card">
+                <div class="book-cover bc-jamila">
+                    <div class="book-cover-top"><span class="book-genre">Novel · Intermediate</span></div>
+                    <div class="book-cover-bottom">
+                        <div class="book-t">Jamila</div>
+                        <div class="book-a">Chyngyz Aitmatov</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- CTA -->
+<div class="cta-section">
+    <div class="cta-box fade">
+        <h2 class="cta-h2">Ready to speak<br><em>Kyrgyz?</em></h2>
+        <p class="cta-p">Join learners discovering the language, literature, and culture of Kyrgyzstan. No credit card needed.</p>
+        <div class="cta-btns">
+            <a href="{{ url_for('register') }}"><button class="btn-cta-main">Start learning free →</button></a>
+            <a href="{{ url_for('login') }}"><button class="btn-cta-outline">Sign in</button></a>
+        </div>
+    </div>
+</div>
+
+
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="footer-brand">Tilbil</div>
+    <div class="footer-copy">© 2026 Tilbil · Learn Kyrgyz</div>
+    <div class="footer-links">
+        <a href="{{ url_for('login') }}" class="footer-link">Sign in</a>
+        <a href="{{ url_for('register') }}" class="footer-link">Register</a>
+    </div>
+</footer>
+
+
+<script>
+const obs = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+            const siblings = Array.from(e.target.parentElement?.children || []).filter(c => c.classList.contains('fade'));
+            const idx = siblings.indexOf(e.target);
+            setTimeout(() => e.target.classList.add('in'), idx * 90);
+            obs.unobserve(e.target);
+        }
+    });
+}, { threshold: 0.08 });
+document.querySelectorAll('.fade').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
