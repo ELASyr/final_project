@@ -1,0 +1,56 @@
+# ── Python ────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# ── Virtual environment ───────────────────────────
+venv/
+env/
+.venv/
+ENV/
+
+# ── Environment variables / secrets ──────────────
+.env
+.env.local
+.env.production
+*.env
+
+# ── Database ──────────────────────────────────────
+tilbil.db
+*.db
+*.sqlite
+*.sqlite3
+
+# ── User uploads ──────────────────────────────────
+static/uploads/
+
+# ── Flask / runtime ───────────────────────────────
+instance/
+.flask_session/
+flask_session/
+
+# ── OS files ──────────────────────────────────────
+.DS_Store
+.DS_Store?
+Thumbs.db
+desktop.ini
+
+# ── Editor / IDE ──────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ── Byte-compiled / cache ─────────────────────────
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# ── Logs ──────────────────────────────────────────
+*.log
+logs/
